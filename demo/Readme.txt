@@ -28,7 +28,7 @@
 1、在开始编译之前，需要确保Gazebo在7.0版本以上
     $ gazebo -v #确认7.0及以上
   如果你的Gazebo版本低于7.0，则需要进行升级
-    $ sudo sh -c 'echo "deb  http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_re lease -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list' 
+    $ sudo sh -c 'echo "deb  http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list' 
     $ wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
     $ sudo apt-get update 
     $ sudo apt-get install gazebo7
