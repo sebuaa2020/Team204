@@ -1,0 +1,30 @@
+<launch>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find wpr_simulation)/worlds/ROS-Academy.world"/>
+    <arg name="paused" value="false"/>
+    <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="true"/>
+    <arg name="recording" value="false"/>
+    <arg name="debug" value="false"/>
+  </include>
+
+  <!-- Spawn a robot into Gazebo -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-file $(find wpr_simulation)/urdf/wpb_home.gazebo -urdf -model wpb_home" />
+
+  <!-- rviz -->
+  <arg name="model" default="$(find wpr_simulation)/urdf/wpb_home.urdf"/>
+  <arg name="gui" default="false" />
+  <arg name="rvizconfig" default="$(find wpr_simulation)/rviz/sensor.rviz" />
+
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+    <rosparam command="load" file="$(find wpr_simulation)/config/wpb_home.yaml" />
+  </node>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" /> -->
+
+
+</launch>
