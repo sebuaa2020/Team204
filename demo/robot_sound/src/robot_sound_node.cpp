@@ -35,8 +35,11 @@ void speakCB(const std_msgs::String::ConstPtr &msg) {
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "wpb_home_speak_node");
-    ros::NodeHandle nh;
-    node = std::make_shared<RobotSoundNode>(RobotSoundNode(nh, false));
+    ros::NodeHandle nh("~");
+    bool online = false;
+    nh.getParam("online", online);
+    ROS_INFO_STREAM("using online engine: " << online);
+    node = std::make_shared<RobotSoundNode>(RobotSoundNode(nh, online));
     ros::Subscriber sub = nh.subscribe("/robot_speak", 10, speakCB);
     ros::spin();
     return 0;
