@@ -3,6 +3,7 @@
 //
 
 #include <ros/ros.h>
+#include <std_msgs/String.h>
 #include "tts_engine.h"
 #include "xfyun_voice.h"
 #include "robot_sound.h"
@@ -10,7 +11,9 @@
 class RobotSoundNode {
     bool online;
     TTSEngine *engine;
+
 public:
+
     RobotSoundNode(ros::NodeHandle &nh, bool online = false) : online(online) {
         if (online) {
             engine = new XfyunVoice(nh);
@@ -24,15 +27,17 @@ public:
     }
 };
 
+std::shared_ptr<RobotSoundNode> node;
+
+void speakCB(const std_msgs::String::ConstPtr &msg) {
+    node->speak(msg->data);
+}
+
 int main(int argc, char **argv) {
     ros::init(argc, argv, "wpb_home_speak_node");
     ros::NodeHandle nh;
-    ros::Rate r(1);
-    RobotSoundNode node(nh, false);
-    for (int i = 0; i < 10 && nh.ok(); i++) {
-        node.speak("Hello " + std::to_string(i));
-        r.sleep();
-        ros::spinOnce();
-    }
+    node = std::make_shared<RobotSoundNode>(RobotSoundNode(nh, false));
+    ros::Subscriber sub = nh.subscribe("/robot_speak", 10, speakCB);
+    ros::spin();
     return 0;
 }
