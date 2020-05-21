@@ -1,0 +1,2 @@
+string type
+string currstate
