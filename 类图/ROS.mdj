@@ -23182,7 +23182,7 @@
 											"top": 614,
 											"width": 88.86083984375,
 											"height": 13,
-											"text": "+x",
+											"text": "+xMin",
 											"horizontalAlignment": 0
 										},
 										{
@@ -23199,7 +23199,7 @@
 											"top": 629,
 											"width": 88.86083984375,
 											"height": 13,
-											"text": "+y",
+											"text": "+yMin",
 											"horizontalAlignment": 0
 										},
 										{
@@ -23216,7 +23216,7 @@
 											"top": 644,
 											"width": 88.86083984375,
 											"height": 13,
-											"text": "+z",
+											"text": "+zMin",
 											"horizontalAlignment": 0
 										},
 										{
@@ -23233,7 +23233,7 @@
 											"top": 659,
 											"width": 88.86083984375,
 											"height": 13,
-											"text": "+width",
+											"text": "+xMax",
 											"horizontalAlignment": 0
 										},
 										{
@@ -23250,7 +23250,7 @@
 											"top": 674,
 											"width": 88.86083984375,
 											"height": 13,
-											"text": "+height",
+											"text": "+yMax",
 											"horizontalAlignment": 0
 										},
 										{
@@ -23267,7 +23267,7 @@
 											"top": 689,
 											"width": 88.86083984375,
 											"height": 13,
-											"text": "+depth",
+											"text": "+zMax",
 											"horizontalAlignment": 0
 										}
 									],
@@ -23759,8 +23759,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFxpV6B8g2vilw="
 							},
-							"name": "x",
-							"type": ""
+							"name": "xMin"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -23768,8 +23767,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFxpV6B8g2vilw="
 							},
-							"name": "y",
-							"type": ""
+							"name": "yMin"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -23777,8 +23775,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFxpV6B8g2vilw="
 							},
-							"name": "z",
-							"type": ""
+							"name": "zMin"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -23786,8 +23783,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFxpV6B8g2vilw="
 							},
-							"name": "width",
-							"type": ""
+							"name": "xMax"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -23795,8 +23791,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFxpV6B8g2vilw="
 							},
-							"name": "height",
-							"type": ""
+							"name": "yMax"
 						},
 						{
 							"_type": "UMLAttribute",
@@ -23804,8 +23799,7 @@
 							"_parent": {
 								"$ref": "AAAAAAFxpV6B8g2vilw="
 							},
-							"name": "depth",
-							"type": ""
+							"name": "zMax"
 						}
 					]
 				}
