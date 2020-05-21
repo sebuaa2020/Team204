@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <termios.h>
 #include <ros/ros.h>
-#include <geometry_msgs/Twist.h>
+#include <std_msgs/Float32MultiArray.h>
 #define BUF_LEN 1
 using namespace std;
 
@@ -117,61 +117,12 @@ std::string vels(double speed,double turn)
 double speed = 0.2;
 double turn = 1;
 
-geometry_msgs::Twist Move_and_turn(double x, double z)
-{
-    geometry_msgs::Twist vel_cmd;
-    vel_cmd.linear.x = x;
-    vel_cmd.linear.y = 0;
-    vel_cmd.linear.z = 0;
-    vel_cmd.angular.x = 0;
-    vel_cmd.angular.y = 0;
-    vel_cmd.angular.z = z;
-    return vel_cmd;
-}
-
-geometry_msgs::Twist Move(double x)
-{
-    geometry_msgs::Twist vel_cmd;
-    vel_cmd.linear.x = x;
-    vel_cmd.linear.y = 0;
-    vel_cmd.linear.z = 0;
-    vel_cmd.angular.x = 0;
-    vel_cmd.angular.y = 0;
-    vel_cmd.angular.z = 0;
-    return vel_cmd;
-}
-
-geometry_msgs::Twist Turn(double x)
-{
-    geometry_msgs::Twist vel_cmd;
-    vel_cmd.linear.x = 0;
-    vel_cmd.linear.y = 0;
-    vel_cmd.linear.z = 0;
-    vel_cmd.angular.x = 0;
-    vel_cmd.angular.y = 0;
-    vel_cmd.angular.z = x;
-    return vel_cmd;
-}
-
-geometry_msgs::Twist Stop()
-{
-    geometry_msgs::Twist vel_cmd;
-    vel_cmd.linear.x = 0;
-    vel_cmd.linear.y = 0;
-    vel_cmd.linear.z = 0;
-    vel_cmd.angular.x = 0;
-    vel_cmd.angular.y = 0;
-    vel_cmd.angular.z = 0;
-    return vel_cmd;
-}
-
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "cmd_move");
   ros::NodeHandle n;
-  ros::Publisher vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
+  ros::Publisher vel_pub = n.advertise<std_msgs::Float32MultiArray>("/move_vel", 10);
 
-geometry_msgs::Twist vel_cmd;
 
   if(setTermiosOrigAndRaw() < 0) return -1;
   int x = 0;
@@ -240,8 +191,10 @@ geometry_msgs::Twist vel_cmd;
       control_turn = max(target_turn, control_turn - 0.1);
     else control_turn = target_turn;
 
-   vel_cmd = Move_and_turn(control_speed, control_turn*0.3);
-    vel_pub.publish(vel_cmd);
+  std_msgs::Float32MultiArray  vel_msg;
+   vel_msg.data.push_back(control_speed);
+    vel_msg.data.push_back(control_turn);
+    vel_pub.publish(vel_msg);
     ros::spinOnce();
   }
 }
