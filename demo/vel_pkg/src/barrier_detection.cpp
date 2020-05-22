@@ -5,6 +5,7 @@
 #include <geometry_msgs/Twist.h>
 
 ros::Publisher main_pub;
+bool swit;
 
 void lidarCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
@@ -43,17 +44,31 @@ std_msgs::Int32  bar_msg;
 
     bar_msg.data = barrier?1:0;
     //vel_pub.publish(vel_cmd);
-    main_pub.publish(bar_msg);
+    if (swit) main_pub.publish(bar_msg);
+}
+
+void barrier_ctrl(const std_msgs::Int32::ConstPtr & msg)
+{
+   if (msg->data == 0)
+   {
+      swit = false;
+   }
+   else
+   {
+     swit = true;
+   }
 }
 
 int main(int argc, char** argv)
 {
+    swit = false;
     ros::init(argc,argv,"auto_move");
     
     ROS_INFO("auto_move_ start!");
 
     ros::NodeHandle nh;
     ros::Subscriber lidar_sub = nh.subscribe("/scan", 10, &lidarCallback);
+     ros::Subscriber barrier_switch = nh.subscribe("/barrier_ctrl", 10, barrier_ctrl);
     main_pub = nh.advertise<std_msgs::Int32>("/main_msgl", 10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/teleop",10);
