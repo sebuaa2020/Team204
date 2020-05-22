@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Twist.h>
+#include <std_msgs/Int32.h>
 
 #define CMD_STOP        0
 #define CMD_FORWARD     1
@@ -10,7 +11,7 @@
 
 #define CMD_DURATION    30
 
-static ros::Publisher vel_pub;
+static ros::Publisher move_pub;
 static ros::Publisher spk_pub;
 static int nCmd = CMD_STOP;
 static int nCount = 0;
@@ -87,7 +88,9 @@ int main(int argc, char** argv)
     ros::NodeHandle n;
     ros::Subscriber sub_sr = n.subscribe("/xfyun/iat", 10, KeywordCB);
     spk_pub = n.advertise<std_msgs::String>("/xfyun/tts", 20);
-    vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
+    move_pub = n.advertise<geometry_msgs::Twist>("/move_base", 10);
+
+    std_msgs::Int32  move_msg;
 
     ros::Rate r(10);
     while(ros::ok())
@@ -96,43 +99,13 @@ int main(int argc, char** argv)
         if(nCount > 0)
         {
             nCount --;
-            if(nCmd == CMD_FORWARD)
-            {
-                vel_cmd.linear.x = 0.1;
-                //ROS_WARN("forward");
-            }
-            if(nCmd == CMD_BACKWARD)
-            {
-                vel_cmd.linear.x = -0.1;
-                //ROS_WARN("backward");
-            }
-            if(nCmd == CMD_LEFT)
-            {
-                vel_cmd.angular.z = 0.1;
-                //ROS_WARN("left");
-            }
-            if(nCmd == CMD_RIGHT)
-            {
-                vel_cmd.angular.z = -0.1;
-                //ROS_WARN("right");
-            }
-            if(nCmd == CMD_STOP)
-            {
-                vel_cmd.linear.x = 0;
-                vel_cmd.linear.y = 0;
-                vel_cmd.angular.z = 0;
-                //ROS_WARN("stop");
-            }
+            move_msg.data = nCmd;
         }
         else
         {
-            nCmd = CMD_STOP;
-            vel_cmd.linear.x = 0;
-            vel_cmd.linear.y = 0;
-            vel_cmd.angular.z = 0;
-            //ROS_WARN("stop");
+            move_msg.data = CMD_STOP;
         }
-        vel_pub.publish(vel_cmd);
+        move_pub.publish(move_msg);
         ros::spinOnce();
         r.sleep();
     }
