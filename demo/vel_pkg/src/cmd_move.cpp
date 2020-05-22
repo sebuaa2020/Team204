@@ -8,9 +8,12 @@
 #include <algorithm>
 #include <termios.h>
 #include <ros/ros.h>
+#include <std_msgs/Int32.h>
 #include <std_msgs/Float32MultiArray.h>
 #define BUF_LEN 1
 using namespace std;
+
+bool swit;
 
 const std::string msg = "Moving around:\n\
    u    i    o\n\
@@ -114,15 +117,28 @@ std::string vels(double speed,double turn)
   return ss.str();
 }
 
+void cmd_ctrl(const std_msgs::Int32::ConstPtr & msg)
+{
+   if (msg->data == 0)
+   {
+      swit = false;
+   }
+   else
+   {
+     swit = true;
+   }
+}
+
 double speed = 0.2;
 double turn = 1;
 
 int main(int argc, char** argv)
 {
+  swit = false;
   ros::init(argc, argv, "cmd_move");
   ros::NodeHandle n;
   ros::Publisher vel_pub = n.advertise<std_msgs::Float32MultiArray>("/move_vel", 10);
-
+  ros::Subscriber sub_sr = n.subscribe("/cmd_switch", 10, cmd_ctrl);
 
   if(setTermiosOrigAndRaw() < 0) return -1;
   int x = 0;
@@ -194,7 +210,7 @@ int main(int argc, char** argv)
   std_msgs::Float32MultiArray  vel_msg;
    vel_msg.data.push_back(control_speed);
     vel_msg.data.push_back(control_turn);
-    vel_pub.publish(vel_msg);
+    if(swit) {vel_pub.publish(vel_msg);}
     ros::spinOnce();
   }
 }

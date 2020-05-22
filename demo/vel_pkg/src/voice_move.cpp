@@ -11,6 +11,7 @@
 
 #define CMD_DURATION    30
 
+bool swit;
 static ros::Publisher move_pub;
 static ros::Publisher spk_pub;
 static int nCmd = CMD_STOP;
@@ -81,12 +82,26 @@ void KeywordCB(const std_msgs::String::ConstPtr & msg)
     }
 }
 
+void voice_ctrl(const std_msgs::Int32::ConstPtr & msg)
+{
+   if (msg -> data == 0)
+   {
+      swit = false;
+   }
+   else
+   {
+     swit = true;
+   }
+}
+
 int main(int argc, char** argv)
 {
+    swit = false;
     ros::init(argc, argv, "voice_move");
 
     ros::NodeHandle n;
     ros::Subscriber sub_sr = n.subscribe("/xfyun/iat", 10, KeywordCB);
+    ros::Subscriber voice_switch = n.subscribe("/voice_ctrl", 10, voice_ctrl);
     spk_pub = n.advertise<std_msgs::String>("/xfyun/tts", 20);
     move_pub = n.advertise<geometry_msgs::Twist>("/move_base", 10);
 
@@ -105,7 +120,7 @@ int main(int argc, char** argv)
         {
             move_msg.data = CMD_STOP;
         }
-        move_pub.publish(move_msg);
+       if (swit) move_pub.publish(move_msg);
         ros::spinOnce();
         r.sleep();
     }

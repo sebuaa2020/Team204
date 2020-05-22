@@ -1,10 +1,12 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Int32.h>
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 
 ros::Publisher vel_pub;
+bool swit;
 
 void lidarCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
 {
@@ -45,8 +47,20 @@ float y = 0;
     vel_msg.data.push_back(x);
     vel_msg.data.push_back(y);
     //vel_pub.publish(vel_cmd);
-    vel_pub.publish(vel_msg);
+    if (swit) vel_pub.publish(vel_msg);
      ros::spinOnce();
+}
+
+void auto_ctrl(const std_msgs::Int32::ConstPtr & msg)
+{
+   if (msg->data == 0)
+   {
+      swit = false;
+   }
+   else
+   {
+     swit = true;
+   }
 }
 
 int main(int argc, char** argv)
@@ -57,6 +71,7 @@ int main(int argc, char** argv)
 
     ros::NodeHandle nh;
     ros::Subscriber lidar_sub = nh.subscribe("/scan", 10, &lidarCallback);
+    ros::Subscriber auto_switch = nh.subscribe("/auto_ctrl", 10, auto_ctrl);
     vel_pub = nh.advertise<std_msgs::Float32MultiArray>("/move_vel", 10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/teleop",10);
