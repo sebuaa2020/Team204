@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sound_play
   xfyun_waterplus
+  rostest
 )
 
 ## System dependencies are found with CMake's conventions
@@ -202,6 +203,11 @@ target_link_libraries(${PROJECT_NAME}_node
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
+
+
+if(CATKIN_ENABLE_TESTING)
+    add_rostest(test/test_echo.test)
+endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
