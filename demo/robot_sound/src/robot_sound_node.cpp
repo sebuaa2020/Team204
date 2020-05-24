@@ -10,15 +10,15 @@
 
 class RobotSoundNode {
     bool online;
-    TTSEngine *engine;
+    std::shared_ptr<TTSEngine> engine;
 
 public:
 
     RobotSoundNode(ros::NodeHandle &nh, bool online = false) : online(online) {
         if (online) {
-            engine = new XfyunVoice(nh);
+            engine = std::make_shared<XfyunVoice>(nh);
         } else {
-            engine = new RobotSound(nh);
+            engine = std::make_shared<RobotSound>(nh);
         }
     }
 
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
     bool online = false;
     nh.getParam("online", online);
     ROS_INFO_STREAM("using online engine: " << online);
-    node = std::make_shared<RobotSoundNode>(RobotSoundNode(nh, online));
+    node = std::make_shared<RobotSoundNode>(nh, online);
     ros::Subscriber sub = nh.subscribe("/robot_speak", 10, speakCB);
     ros::spin();
     return 0;

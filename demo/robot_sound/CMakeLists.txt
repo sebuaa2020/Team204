@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   sound_play
+  xfyun_waterplus
 )
 
 ## System dependencies are found with CMake's conventions
