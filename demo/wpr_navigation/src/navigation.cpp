@@ -3,7 +3,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <ros/ros.h>
 #include <tf/transform_datatypes.h>
-#include <wpr_msgs/exception.h>
+#include <wpr_msgs/instruction.h>
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction>
     MoveBaseClient;
@@ -42,12 +42,12 @@ int main(int argc, char** argv)
 
     ros::NodeHandle nh;
     ros::Subscriber goalSub = nh.subscribe("navigation_ctrl", 1, goalCallBack);
-    ros::Publisher pub = nh.advertise<wpr_msgs::exception>("exception", 1000);
+    ros::Publisher pub = nh.advertise<wpr_msgs::instruction>("instruction", 1000);
 
     ros::Rate loop_rate(1.0);
 
     state = S_IDLE;
-    wpr_msgs::exception exp;
+    wpr_msgs::instruction exp;
     while (ros::ok()) {
         flag = F_NOTSET;
         ros::spinOnce();
@@ -85,6 +85,8 @@ int main(int argc, char** argv)
                 exp.description = "aborted";
                 pub.publish(exp);
                 state = S_IDLE;
+            } else {
+                ROS_INFO("%s", goalState.toString().c_str());
             }
         }
         loop_rate.sleep();
