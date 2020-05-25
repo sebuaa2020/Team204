@@ -50,29 +50,56 @@ void executeMapManage(const wpr_msgs::instruction& msg)
 
 void executeNavigation(const wpr_msgs::instruction& msg)
 {
-    switch (state) {
-    case NOT_LOAD_MAP:
-        break;
-    case MAPPING:
-        break;
-    case IDLE:
-        break;
-    case NAVIGATING:
-        break;
-    case GRABING:
-        break;
-    default:
-        ROS_INFO("unrecognized state");
-        break;
+    if (msg.type == wpr_msgs::instruction::NAV_START) {
+        switch (state) {
+        case NOT_LOAD_MAP:
+        case MAPPING:
+        case GRABING:
+            /**/
+            break;
+        case IDLE:
+        case NAVIGATING:
+            navStart(msg);
+            state = IDLE;
+            break;
+        default:
+            ROS_INFO("unrecognized state");
+            break;
+        }
+    } else if (msg.type == wpr_msgs::instruction::NAV_CANCEL) {
+        switch (state) {
+        case NOT_LOAD_MAP:
+        case MAPPING:
+        case IDLE:
+        case GRABING:
+            /**/
+            break;
+        case NAVIGATING:
+            navCancel();
+            state = IDLE;
+            break;
+        default:
+            ROS_INFO("unrecognized state");
+            break;
+        }
+    } else {
+        ROS_INFO("unrecognized msg in executeNavigation");
     }
 }
-
 void executeGrab(const wpr_msgs::instruction& msg)
 {
 }
 
 void exceptionNavigation(const wpr_msgs::instruction& msg)
 {
+    if (state != NAVIGATING) {
+        ROS_INFO("[exception] the exception shouldn't be published during this state");
+    } else {
+        if (msg.type == wpr_msgs::instruction::NAV_UNREACHABLE) {
+            /**/
+        }
+        state = IDLE;
+    }
 }
 
 void subCallback(const wpr_msgs::instruction& msg)
