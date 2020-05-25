@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 
     ros::NodeHandle n;
     ros::Subscriber sub_sr = n.subscribe("/xfyun/iat", 10, KeywordCB);
-    ros::Subscriber voice_switch = n.subscribe("/voice_ctrl", 10, voice_ctrl);
+    ros::Subscriber voice_switch = n.subscribe("/voice_switch", 10, voice_ctrl);
     spk_pub = n.advertise<std_msgs::String>("/xfyun/tts", 20);
     move_pub = n.advertise<geometry_msgs::Twist>("/move_base", 10);
 
