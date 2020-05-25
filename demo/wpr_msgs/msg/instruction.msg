@@ -11,13 +11,13 @@ int8 BACKWARD = 2
 int8 TURNLEFT = 3
 int8 TURNRIGHT = 4
 int8 LINEAR_SPEEDUP = 5
-int8 LINEAR_SPPEDDOWN = 6
+int8 LINEAR_SPEEDDOWN = 6
 int8 ANGULAR_SPEEDUP = 7
 int8 ANGULAR_SPEEDDOWN = 8
 
 ############################
 # 建图相关指令
-int8 MAPPPING_START = 9
+int8 MAPPING_START = 9
 int8 MAPPING_END = 10
 
 ############################
@@ -43,4 +43,3 @@ int8 GRAB_START = 17
 int8 NAV_UNREACHABLE = 101
 int8 NAV_ARRIVED = 102
 int8 NAV_REJECTED = 103
-int8 NAV_CANCELLED = 104
