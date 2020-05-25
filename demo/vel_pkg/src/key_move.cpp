@@ -138,7 +138,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "cmd_move");
   ros::NodeHandle n;
   ros::Publisher vel_pub = n.advertise<std_msgs::Float32MultiArray>("/move_vel", 10);
-  ros::Subscriber sub_sr = n.subscribe("/cmd_switch", 10, cmd_ctrl);
+  ros::Subscriber sub_sr = n.subscribe("/key_switch", 10, cmd_ctrl);
 
   if(setTermiosOrigAndRaw() < 0) return -1;
   int x = 0;
@@ -153,6 +153,7 @@ int main(int argc, char** argv)
   while(1)
   {
     int key = getKey();
+    printf( "enter: %c \n", key);
     if(key < 0)
     {
       return -1;

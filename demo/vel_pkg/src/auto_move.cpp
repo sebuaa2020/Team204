@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
     ros::NodeHandle nh;
     ros::Subscriber lidar_sub = nh.subscribe("/scan", 10, &lidarCallback);
-    ros::Subscriber auto_switch = nh.subscribe("/auto_ctrl", 10, auto_ctrl);
+    ros::Subscriber auto_switch = nh.subscribe("/auto_switch", 10, auto_ctrl);
     vel_pub = nh.advertise<std_msgs::Float32MultiArray>("/move_vel", 10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/teleop",10);
