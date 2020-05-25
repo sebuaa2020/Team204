@@ -15,6 +15,7 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>gazebo_ros</build_depend>
+  <build_depend>wpr_msgs</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
@@ -35,4 +36,5 @@
   <run_depend>amcl</run_depend>
   <run_depend>gmapping</run_depend>
   <run_depend>dwa_local_planner</run_depend>
+  <build_depend>wpr_msgs</build_depend>
 </package>
