@@ -7,7 +7,8 @@ main_win.title("简易机器人GUI界面")
 main_win.geometry("1000x1000")
 
 def create_map():
-    os.system("gnome-terminal  -- " + "Instruction of creating the map.")
+    os.system("gnome-terminal " + "-- bash -c \"source ~/Documents/demo/devel/setup.bash; roslaunch robot_sim_demo robot_spawn.launch\"")
+    os.system("gnome-terminal " + "-- bash -c \"source ~/Documents/demo/devel/setup.bash; rosrun vel_pkg wpb_home_velocity_control\"")
 
 def nav():
     os.system("gnome-terminal  -- " + "Instruction of navgatoin.")
