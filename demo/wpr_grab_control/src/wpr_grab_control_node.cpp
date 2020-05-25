@@ -24,6 +24,7 @@ private:
 public:
     void init(ros::NodeHandle &nh) {
         mani_ctrl_pub = nh.advertise<sensor_msgs::JointState>("/wpb_home/mani_ctrl", 30);
+        mani_ctrl_pub.publish(ctrl_msg);
     }
 
     WPRJointControl() {
