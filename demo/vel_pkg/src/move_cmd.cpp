@@ -83,7 +83,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "move_base");
   ros::NodeHandle n;
-   ros::Subscriber sub_sr = n.subscribe("/move_base", 10, move_action);
+   ros::Subscriber sub_sr = n.subscribe("/move_cmd", 10, move_action);
   ros::Publisher vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
 
 geometry_msgs::Twist vel_cmd;

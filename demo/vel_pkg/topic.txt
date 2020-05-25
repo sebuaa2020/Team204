@@ -1,0 +1,48 @@
+开关模块：
+自动行走开关开关：auto_switch
+Int32
+0关1开
+障碍物检测开关：barrier_switch
+Int32
+0关1开
+键盘控制开关：key_switch
+Int32
+0关1开
+命令控制开关：inter_switch
+Int32
+0关1开
+声音控制开关：voice_switch
+Int32
+0关1开
+地图管理开关：map_switch
+Int32
+0关1开
+
+运动控制基础：move_cmd
+Int32
+#define CMD_STOP        0
+#define CMD_FORWARD     1
+#define CMD_BACKWARD    2  
+#define CMD_LEFT        3
+#define CMD_RIGHT       4   
+速度控制：move_vel
+Float32MultiArray
+speed，turn
+运动控制基础：inter_move
+Int32
+#define STOP 9
+#define FORWARD 1
+#define BACKWARD 2
+#define LEFT 3
+#define RIGHT 4
+#define SP_UP 5 前进加速
+#define SP_DOWN 6 前进减速
+#define TU_UP 7 转弯加速
+#define TU_DOWN 8 转弯减速
+地图管理：map_manager
+String
+load xx
+save xx
+unload 
+delete xx
+list
