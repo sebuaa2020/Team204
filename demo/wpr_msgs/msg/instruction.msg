@@ -35,3 +35,12 @@ int8 NAV_CANCEL = 16
 ############################
 # 目标抓取相关指令
 int8 GRAB_START = 17
+
+
+
+################################################
+# 异常处理
+int8 NAV_UNREACHABLE = 101
+int8 NAV_ARRIVED = 102
+int8 NAV_REJECTED = 103
+int8 NAV_CANCELLED = 104
