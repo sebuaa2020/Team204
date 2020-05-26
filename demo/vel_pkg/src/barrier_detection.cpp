@@ -4,7 +4,7 @@
 #include <sensor_msgs/LaserScan.h>
 #include <geometry_msgs/Twist.h>
 
-ros::Publisher main_pub;
+ros::Publisher move_pub;
 bool swit;
 
 void lidarCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
@@ -42,9 +42,9 @@ std_msgs::Int32  bar_msg;
         barrier = true;
     }
 
-    bar_msg.data = barrier?1:0;
+    bar_msg.data = 0;
     //vel_pub.publish(vel_cmd);
-    if (swit) main_pub.publish(bar_msg);
+    if (swit && barrier) move_pub.publish(bar_msg);
 }
 
 void barrier_ctrl(const std_msgs::Int32::ConstPtr & msg)
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     ros::Subscriber lidar_sub = nh.subscribe("/scan", 10, &lidarCallback);
      ros::Subscriber barrier_switch = nh.subscribe("/barrier_switch", 10, barrier_ctrl);
-    main_pub = nh.advertise<std_msgs::Int32>("/main_msgl", 10);
+    move_pub = nh.advertise<std_msgs::Int32>("move_cmd", 10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/teleop",10);
 
