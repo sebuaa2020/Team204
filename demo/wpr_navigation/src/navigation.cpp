@@ -66,13 +66,6 @@ int main(int argc, char** argv)
                 exp.description = "succeeded";
                 pub.publish(exp);
                 state = S_IDLE;
-            } else if (goalState == actionlib::SimpleClientGoalState::RECALLED
-                || goalState == actionlib::SimpleClientGoalState::PREEMPTED) {
-                ROS_INFO("[navigation] goal cancelled.");
-                exp.type = exp.NAV_CANCELLED;
-                exp.description = "cancelled";
-                pub.publish(exp);
-                state = S_IDLE;
             } else if (goalState == actionlib::SimpleClientGoalState::REJECTED) {
                 ROS_INFO("[navigation] goal rejected.");
                 exp.type = exp.NAV_REJECTED;
@@ -86,7 +79,8 @@ int main(int argc, char** argv)
                 pub.publish(exp);
                 state = S_IDLE;
             } else {
-                ROS_INFO("%s", goalState.toString().c_str());
+                if (goalState != actionlib::SimpleClientGoalState::ACTIVE)
+                    ROS_INFO("%s", goalState.toString().c_str());
             }
         }
         loop_rate.sleep();
