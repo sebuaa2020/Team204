@@ -6,6 +6,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/Pose2D.h>
+#include <geometry_msgs/Twist.h>
 #include <std_msgs/String.h>
 #include <memory>
 #include "wpr_grab_control/wpr_grab_control_node.h"
@@ -21,6 +22,7 @@ class WPRJointControl : public JointControl {
 private:
     ros::Publisher mani_ctrl_pub;
     sensor_msgs::JointState ctrl_msg;
+    
 public:
     void init(ros::NodeHandle &nh) {
         mani_ctrl_pub = nh.advertise<sensor_msgs::JointState>("/wpb_home/mani_ctrl", 30);
@@ -59,9 +61,7 @@ public:
 };
 
 
-void VelCmd(float inVx, float inVy, float inTz) {
 
-}
 
 
 class GrabControl {
@@ -84,6 +84,8 @@ class GrabControl {
 
     ros::Publisher ctrl_pub;
     std_msgs::String ctrl_msg;
+    
+    ros::Publisher vel_pub;
 
     ros::Subscriber pose_diff_sub;
     geometry_msgs::Pose2D pose_diff;
@@ -109,6 +111,14 @@ public:
         fTargetGrabX = 0.8;
         fTargetGrabY = 0.0;
         nStep = STEP_WAIT;
+    }
+
+    void VelCmd(float inVx, float inVy, float inTz) {
+        geometry_msgs::Twist vel_cmd;
+        vel_cmd.linear.x = inVx;
+        vel_cmd.linear.y = inVy;
+        vel_cmd.angular.z = inTz;
+        vel_pub.publish(vel_cmd);
     }
 
     //2、前后运动控制到平面的距离
@@ -288,6 +298,7 @@ public:
 
     void init(ros::NodeHandle &nh) {
         ctrl_pub = nh.advertise<std_msgs::String>("/wpb_home/ctrl", 30);
+        vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 30);
         pose_diff_sub = nh.subscribe("/wpb_home/pose_diff", 1, &GrabControl::PoseDiffCallback,
                                      this);
     }
