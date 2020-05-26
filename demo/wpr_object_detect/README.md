@@ -27,4 +27,12 @@ Mapping from `std_msgs::Float32MultiArray` to Bounding Box:
 | 4     | zMin  |
 | 5     | zMax  |
 
+The second bounding box:
+
+| Index | Field |
+| ----- | ----- |
+| 6     | xMin  |
+| ...   | ...   |
+| 11    | zMax  |
+
 Size of the array must be a multiple of 6.
