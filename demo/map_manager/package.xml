@@ -56,4 +56,7 @@
     <!-- Other tools can request additional information be placed here -->
 
   </export>
+<build_depend>wpr_msgs</build_depend>
+<build_export_depend>wpr_msgs</build_export_depend>
+<exec_depend>wpr_msgs</exec_depend>
 </package>

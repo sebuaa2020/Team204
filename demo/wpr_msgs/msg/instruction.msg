@@ -14,28 +14,35 @@ int8 LINEAR_SPEEDUP = 5
 int8 LINEAR_SPEEDDOWN = 6
 int8 ANGULAR_SPEEDUP = 7
 int8 ANGULAR_SPEEDDOWN = 8
+int8 STOP = 9
 
 ############################
 # 建图相关指令
-int8 MAPPING_START = 9
-int8 MAPPING_END = 10
+int8 MAPPING_START = 10
+int8 MAPPING_END = 11
 
 ############################
 # 地图管理相关指令
-int8 LIST_MAP = 11
-int8 DELETE_MAP = 12
-int8 LOAD_MAP = 13
-int8 UNLOAD_MAP = 14
+int8 LIST_MAP = 12
+int8 DELETE_MAP = 13
+int8 LOAD_MAP = 14
+int8 UNLOAD_MAP = 15
+int8 SAVE_MAP = 16
 
 ############################
 # 导航相关指令
-int8 NAV_START = 15
-int8 NAV_CANCEL = 16
+int8 NAV_START = 17
+int8 NAV_CANCEL = 18
 
 ############################
 # 目标抓取相关指令
-int8 GRAB_START = 17
+int8 GRAB_START = 19
 
+
+############################
+# 障碍物检测相关指令
+int8 BARRIER_START = 20
+int8 BARRIER_END = 21
 
 
 ################################################
@@ -43,3 +50,5 @@ int8 GRAB_START = 17
 int8 NAV_UNREACHABLE = 101
 int8 NAV_ARRIVED = 102
 int8 NAV_REJECTED = 103
+int8 MAP_DEL_ERROR = 104
+int8 MAP_LOAD_ERROR = 105

@@ -68,8 +68,4 @@
   <node pkg="vel_pkg" type="lidar_filter" name="lidar_filter">
     <param name="pub_topic" value="/scan"/>
   </node>
-
-  <node pkg="vel_pkg" type="wpb_home_behavior_node" name="wpb_home_behavior_node">
-  </node>
-
 </launch>

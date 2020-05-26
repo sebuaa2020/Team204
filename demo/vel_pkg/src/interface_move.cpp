@@ -140,7 +140,7 @@ void inter_ctrl(const std_msgs::Int32::ConstPtr & msg)
 
 int main(int argc, char** argv)
 {
-  swit = false;
+  swit = true;
   ros::init(argc, argv, "interface_move");
   ros::NodeHandle n;
   ros::Publisher vel_pub = n.advertise<std_msgs::Float32MultiArray>("/move_vel", 10);

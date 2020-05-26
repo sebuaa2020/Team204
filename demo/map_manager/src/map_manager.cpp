@@ -9,6 +9,7 @@
 #include <cstdlib> 
 #include<fstream>
 #include<iostream>
+#include <wpr_msgs/instruction.h>
 
 #define CMD_STOP        0
 #define CMD_FORWARD     1
@@ -21,8 +22,7 @@
 using namespace std;
 
 bool swit;
-static ros::Publisher move_pub;
-static ros::Publisher spk_pub;
+static ros::Publisher main_pub;
 static int nCmd = CMD_STOP;
 static int nCount = 0;
 
@@ -42,10 +42,12 @@ void save_map(char* name)
        in.close();
     if (find(files.begin(), files.end(), name) != files.end())
     {
-        printf("wocao\n");
-        return;
+        printf("unlegal name\n");
     }
-    files.push_back(name);
+    else
+    {
+        files.push_back(name);
+    }
     char str[100];
     sprintf(str, "rosrun map_server map_saver -f /home/yjz/demo_ws/src/map_manager/maps/%s", name);
     int res = system(str);
@@ -88,7 +90,9 @@ void load_map(char* name)
 
      if (find(files.begin(), files.end(), name) == files.end())
     {
-        printf("wocao\n");
+        wpr_msgs::instruction msg;
+        msg.type = wpr_msgs::instruction::MAP_LOAD_ERROR;
+        main_pub.publish(msg);
         return;
     }
     char str[100];
@@ -122,7 +126,9 @@ void del_map(char* name)
     vector<string>::iterator it = find(files.begin(), files.end(), name);
      if (it == files.end())
     {
-        printf("wocao\n");
+        wpr_msgs::instruction msg;
+        msg.type = wpr_msgs::instruction::MAP_DEL_ERROR;
+        main_pub.publish(msg);
         return;
     }
     files.erase(it);
@@ -219,8 +225,8 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "map_manager");
   ros::NodeHandle n;
   ros::Subscriber sub_sr = n.subscribe("/map_switch", 10, map_ctrl);
-  ros::Subscriber sub = n.subscribe("/map_switch", 10, KeywordCB);
-
+  ros::Subscriber sub = n.subscribe("/map_manager", 10, KeywordCB);
+  main_pub = n.advertise<wpr_msgs::instruction>("instruction", 1000);
   ros::spin();
 
     return 0;
