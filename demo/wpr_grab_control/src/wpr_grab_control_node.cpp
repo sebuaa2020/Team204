@@ -385,7 +385,7 @@ public:
                     nStep = STEP_PLANE_DIST;
                     break;
                 case STEP_PLANE_DIST:
-                    nStep = stepPlaneDist() ? STEP_FIND_OBJ : STEP_PLANE_DIST;
+                    nStep = stepPlaneDist() ? STEP_FIND_PLACE : STEP_PLANE_DIST;
                     break;
                 case STEP_FIND_PLACE:
                     nStep = stepFindPlace() ? STEP_HAND_UP : STEP_EXCEPTION;
@@ -396,14 +396,15 @@ public:
                     nStep = STEP_OBJ_DIST;
                     break;
                 case STEP_OBJ_DIST:
-                    nStep = stepObjectDist() ? STEP_HAND_UP : STEP_FORWARD;
+                    nStep = stepObjectDist() ? STEP_FORWARD : STEP_OBJ_DIST;
                     break;
                 case STEP_FORWARD:
                     nStep = stepForward() ? STEP_RELEASE : STEP_FORWARD;
                     break;
                 case STEP_RELEASE:
                     //此处暂用释放动作
-                    nStep = stepRelease() ? STEP_OBJ_UP : STEP_OBJ_FREE;
+                    stepRelease();
+                    nStep = STEP_OBJ_FREE;
                     break;
                 case STEP_OBJ_FREE:
                     nStep = STEP_BACKWARD;
