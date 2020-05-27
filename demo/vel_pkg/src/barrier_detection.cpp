@@ -24,8 +24,8 @@ void lidarCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
     float rightDist = scan->ranges[nRight];
     int nRightMid = (nMid+nRight)/2;
     float rightMidDist = scan->ranges[nRightMid];
-    ROS_INFO("Point[%d] = %f,Point[%d] = %f,Point[%d] = %f, Point[%d] = %f,Point[%d] = %f", 
-        nLeft, leftDist, nLeftMid, leftMidDist, nMid, frontDist, nRightMid, rightMidDist, nRight, rightDist); 
+    //ROS_INFO("Point[%d] = %f,Point[%d] = %f,Point[%d] = %f, Point[%d] = %f,Point[%d] = %f", 
+      //  nLeft, leftDist, nLeftMid, leftMidDist, nMid, frontDist, nRightMid, rightMidDist, nRight, rightDist); 
 
 std_msgs::Int32  bar_msg;
    // geometry_msgs::Twist vel_cmd;
@@ -44,11 +44,17 @@ std_msgs::Int32  bar_msg;
 
     bar_msg.data = 0;
     //vel_pub.publish(vel_cmd);
-    if (swit && barrier) move_pub.publish(bar_msg);
+    if (swit && barrier) 
+    {
+        printf("barrier warning\n");
+        move_pub.publish(bar_msg);
+        ros::spinOnce();
+    }
 }
 
 void barrier_ctrl(const std_msgs::Int32::ConstPtr & msg)
 {
+    printf("barrier  recieve\n");
    if (msg->data == 0)
    {
       swit = false;
@@ -62,14 +68,14 @@ void barrier_ctrl(const std_msgs::Int32::ConstPtr & msg)
 int main(int argc, char** argv)
 {
     swit = false;
-    ros::init(argc,argv,"auto_move");
+    ros::init(argc,argv,"barrier_detection");
     
-    ROS_INFO("auto_move_ start!");
+    ROS_INFO("barrier_ start!");
 
     ros::NodeHandle nh;
     ros::Subscriber lidar_sub = nh.subscribe("/scan", 10, &lidarCallback);
      ros::Subscriber barrier_switch = nh.subscribe("/barrier_switch", 10, barrier_ctrl);
-    move_pub = nh.advertise<std_msgs::Int32>("move_cmd", 10);
+    move_pub = nh.advertise<std_msgs::Int32>("/move_cmd", 10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/teleop",10);
 

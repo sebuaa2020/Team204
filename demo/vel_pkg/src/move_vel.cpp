@@ -38,12 +38,14 @@ float speed, turn;
 speed = msg->data.at(0);
 turn = msg->data.at(1);
   vel_cmd = Move_and_turn(speed, turn*0.3);
+  printf("rec %f, %f\n", speed, turn);
   vel_pub.publish(vel_cmd);
    ros::spinOnce();
 }
 
 int main(int argc, char** argv)
 {
+    ROS_INFO("move_vel  start\n");
   ros::init(argc, argv, "move_vel");
   ros::NodeHandle n;
   vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
