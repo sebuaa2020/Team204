@@ -42,13 +42,21 @@ std_msgs::Int32  bar_msg;
         barrier = true;
     }
 
-    bar_msg.data = 0;
     //vel_pub.publish(vel_cmd);
     if (swit && barrier) 
     {
-        printf("barrier warning\n");
+        bar_msg.data = 1;
         move_pub.publish(bar_msg);
         ros::spinOnce();
+    }
+    else
+    {
+        bar_msg.data = 0;
+        if (swit)
+        {
+            move_pub.publish(bar_msg);
+            ros::spinOnce();
+        }
     }
 }
 
@@ -75,7 +83,7 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     ros::Subscriber lidar_sub = nh.subscribe("/scan", 10, &lidarCallback);
      ros::Subscriber barrier_switch = nh.subscribe("/barrier_switch", 10, barrier_ctrl);
-    move_pub = nh.advertise<std_msgs::Int32>("/move_cmd", 10);
+    move_pub = nh.advertise<std_msgs::Int32>("/move_lock", 10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/teleop",10);
 

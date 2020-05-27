@@ -17,7 +17,7 @@ int main(int argc, char** argv)
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/teleop",10);
     int i = 0;
-    while(i < 100)
+    while(i < 10)
     {
     printf("send %d\n", 1);
     std_msgs::Int32 msg;
@@ -27,5 +27,25 @@ int main(int argc, char** argv)
     ros::Duration(0.8).sleep();
     i++;
     }
+
+    i= 0;
+    while(i < 20)
+    {
+    printf("send %d\n", 5);
+    std_msgs::Int32 msg;
+    msg.data = 5;
+    test_pub.publish(msg);
+    ros::spinOnce();
+    ros::Duration(0.8).sleep();
+    i++;
+    }
+
+    printf("send %d\n", 0);
+    std_msgs::Int32 msg;
+    msg.data = 0;
+    test_pub.publish(msg);
+    ros::spinOnce();
+    ros::Duration(0.8).sleep();
+
 return 0;
 }

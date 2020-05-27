@@ -19,6 +19,7 @@ static int nCount = 0;
 
 void KeywordCB(const std_msgs::String::ConstPtr & msg)
 {
+    ROS_INFO("voice rec msg\n");
     //ROS_WARN("[KeywordCB] - %s",msg->data.c_str());
     geometry_msgs::Twist vel_cmd;
     vel_cmd.linear.x = 0;
@@ -100,10 +101,11 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "voice_move");
 
     ros::NodeHandle n;
+    //ros::Subscriber sub_sr = n.subscribe("/xfyun/iat", 10, KeywordCB);
     ros::Subscriber sub_sr = n.subscribe("/xfyun/iat", 10, KeywordCB);
     ros::Subscriber voice_switch = n.subscribe("/voice_switch", 10, voice_ctrl);
     spk_pub = n.advertise<std_msgs::String>("/xfyun/tts", 20);
-    move_pub = n.advertise<geometry_msgs::Twist>("/move_base", 10);
+    move_pub = n.advertise<std_msgs::Int32>("/move_cmd", 10);
 
     std_msgs::Int32  move_msg;
 
