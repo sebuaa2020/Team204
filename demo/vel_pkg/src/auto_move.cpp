@@ -25,8 +25,8 @@ void lidarCallback(const sensor_msgs::LaserScan::ConstPtr& scan)
     float rightDist = scan->ranges[nRight];
     int nRightMid = (nMid+nRight)/2;
     float rightMidDist = scan->ranges[nRightMid];
-    ROS_INFO("Point[%d] = %f,Point[%d] = %f,Point[%d] = %f, Point[%d] = %f,Point[%d] = %f", 
-        nLeft, leftDist, nLeftMid, leftMidDist, nMid, frontDist, nRightMid, rightMidDist, nRight, rightDist); 
+    //ROS_INFO("Point[%d] = %f,Point[%d] = %f,Point[%d] = %f, Point[%d] = %f,Point[%d] = %f", 
+    //    nLeft, leftDist, nLeftMid, leftMidDist, nMid, frontDist, nRightMid, rightMidDist, nRight, rightDist); 
 
 std_msgs::Float32MultiArray  vel_msg;
 float x = 0;
@@ -53,18 +53,22 @@ float y = 0;
 
 void auto_ctrl(const std_msgs::Int32::ConstPtr & msg)
 {
+  ROS_INFO("recieve\n");
    if (msg->data == 0)
    {
       swit = false;
    }
    else
    {
+     
      swit = true;
    }
+    ros::spinOnce();
 }
 
 int main(int argc, char** argv)
 {
+    swit = false;
     ros::init(argc,argv,"auto_move");
     
     ROS_INFO("auto_move_ start!");
@@ -76,5 +80,8 @@ int main(int argc, char** argv)
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel",10);
     //vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel_mux/input/teleop",10);
 
-    ros::spin();
+   // ros::MultiThreadedSpinner s(2);  //多线程
+   //ros::spin(s); 
+   ros::spin();
+return 0;
 }

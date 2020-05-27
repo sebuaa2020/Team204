@@ -140,12 +140,14 @@ void inter_ctrl(const std_msgs::Int32::ConstPtr & msg)
 
 int main(int argc, char** argv)
 {
+  ROS_INFO("inter move start\n");
   swit = true;
+  nState = 0;
   ros::init(argc, argv, "interface_move");
   ros::NodeHandle n;
   ros::Publisher vel_pub = n.advertise<std_msgs::Float32MultiArray>("/move_vel", 10);
   ros::Subscriber sub_sr = n.subscribe("/inter_switch", 10, inter_ctrl);
-ros::Subscriber sub_sr_ = n.subscribe("/inter_move", 10, action);
+  ros::Subscriber sub = n.subscribe("/inter_move", 10, action);
 
   int x = 0;
   int th = 0;
@@ -159,6 +161,7 @@ ros::Subscriber sub_sr_ = n.subscribe("/inter_move", 10, action);
   while(1)
   {
     int key = getKey();
+    if (key != ' ') printf("enter %c\n", key);
     if(key < 0)
     {
       return -1;
@@ -218,5 +221,6 @@ ros::Subscriber sub_sr_ = n.subscribe("/inter_move", 10, action);
     vel_msg.data.push_back(control_turn);
     if(swit) {vel_pub.publish(vel_msg);}
     ros::spinOnce();
+    ros::Duration(0.8).sleep();
   }
 }

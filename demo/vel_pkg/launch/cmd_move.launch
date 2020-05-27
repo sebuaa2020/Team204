@@ -2,5 +2,6 @@
 
     <node pkg="vel_pkg" type="move_vel" name="move_vel"  output="screen"/> 
     <node pkg="vel_pkg" type="cmd_move" name="cmd_move" output="screen"/>
-
+    <node pkg="vel_pkg" type="move_cmd" name="move_cmd"  output="screen"/> 
+    <node pkg="vel_pkg" type="barrier_detection" name="barrier_detection"  output="screen"/> 
 </launch>

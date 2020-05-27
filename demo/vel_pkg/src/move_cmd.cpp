@@ -10,6 +10,8 @@
 #define CMD_LEFT        3
 #define CMD_RIGHT       4   
 
+static  ros::Publisher vel_pub;
+
 geometry_msgs::Twist Move(double x)
 {
     geometry_msgs::Twist vel_cmd;
@@ -48,14 +50,13 @@ geometry_msgs::Twist Stop()
 
 void move_action(const std_msgs::Int32::ConstPtr & msg)
 {
-    ros::NodeHandle n;
-  ros::Publisher vel_pub = n.advertise<std_msgs::String>("/cmd_vel", 10);
-
+printf("cmd recieve\n");
  geometry_msgs::Twist vel_cmd;
 
 switch(msg->data)
 {
     case CMD_STOP:
+        printf("cmd recieve stop\n");
         vel_cmd = Stop();
         break;
     case CMD_FORWARD:
@@ -81,18 +82,13 @@ switch(msg->data)
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "move_base");
+    printf("move cmd start\n");
+  ros::init(argc, argv, "move_cmd");
   ros::NodeHandle n;
    ros::Subscriber sub_sr = n.subscribe("/move_cmd", 10, move_action);
-  ros::Publisher vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
+  vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
 
-geometry_msgs::Twist vel_cmd;
-
-ros::Rate r(10);
-while(ros::ok()){
-  ros::spinOnce();
-  r.sleep();
-}
+    ros::spin();
 
 return 0;
 }

@@ -1,0 +1,5 @@
+<launch>
+
+    <node pkg="vel_pkg" type="move_vel" name="move_vel"  output="screen"/> 
+    <node pkg="vel_pkg" type="interface_move" name="interface_move" output="screen"/>
+</launch>

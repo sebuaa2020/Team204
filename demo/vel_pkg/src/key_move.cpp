@@ -119,6 +119,7 @@ std::string vels(double speed,double turn)
 
 void cmd_ctrl(const std_msgs::Int32::ConstPtr & msg)
 {
+  printf("key move  recieve\n");
    if (msg->data == 0)
    {
       swit = false;
@@ -153,7 +154,6 @@ int main(int argc, char** argv)
   while(1)
   {
     int key = getKey();
-    printf( "enter: %c \n", key);
     if(key < 0)
     {
       return -1;
