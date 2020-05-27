@@ -341,18 +341,22 @@ public:
                     nStep = stepObjectDist() ? STEP_HAND_UP : STEP_OBJ_DIST;
                     break;
                 case STEP_HAND_UP:
+                    stepHandUp();
                     nStep = STEP_FORWARD;
                     break;
                 case STEP_FORWARD:
                     nStep = stepForward() ? STEP_GRAB : STEP_FORWARD;
                     break;
                 case STEP_GRAB:
+                    stepGrab();
                     nStep = STEP_OBJ_UP;
                     break;
                 case STEP_OBJ_UP:
+                    stepObjUp();
                     nStep = STEP_BACKWARD;
                     break;
                 case STEP_BACKWARD:
+                    stepBackward();
                     nStep = STEP_DONE;
                     break;
                 case STEP_DONE:
@@ -393,6 +397,7 @@ public:
                     //Release 应该先HAND_UP再对准
                 case STEP_HAND_UP:
                     //TODO
+                    stepHandUp();
                     nStep = STEP_OBJ_DIST;
                     break;
                 case STEP_OBJ_DIST:
@@ -410,6 +415,7 @@ public:
                     nStep = STEP_BACKWARD;
                     break;
                 case STEP_BACKWARD:
+                    stepBackward();
                     nStep = STEP_DONE;
                     break;
                     // 以下几个状态不应在RELEASE()中出现，因此转移为EXCEPTION状态
