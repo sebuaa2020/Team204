@@ -10,7 +10,7 @@
 #include <pcl/segmentation/extract_polygonal_prism_data.h>
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/surface/convex_hull.h>
-#include "object_detect.h"
+#include "wpr_object_detect/object_detect.h"
 
 
 ObjectDetect::ObjectDetect() : zPassThroughLimitMin(0.1), zPassThroughLimitMax(1.5) {
