@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/PointStamped.h>
 #include <visualization_msgs/Marker.h>
-#include "draw_utils.h"
+#include "wpr_object_detect/draw_utils.h"
 
 DrawUtils::DrawUtils() {
 
