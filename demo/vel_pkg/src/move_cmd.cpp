@@ -12,6 +12,7 @@
 
 static  ros::Publisher vel_pub;
 
+bool lock;
 geometry_msgs::Twist Move(double x)
 {
     geometry_msgs::Twist vel_cmd;
@@ -60,7 +61,7 @@ switch(msg->data)
         vel_cmd = Stop();
         break;
     case CMD_FORWARD:
-        vel_cmd = Move(0.5);
+        if (!lock) vel_cmd = Move(0.5);
         break;
     case CMD_BACKWARD:
         vel_cmd = Move(-0.5);
@@ -79,13 +80,26 @@ switch(msg->data)
    ros::spinOnce();
 }
 
+void move_ctrl(const std_msgs::Int32::ConstPtr & msg)
+{
+   if (msg -> data == 0)
+   {
+      lock = false;
+   }
+   else
+   {
+     lock = true;
+   }
+}
 
 int main(int argc, char** argv)
 {
+    lock = false;
     printf("move cmd start\n");
   ros::init(argc, argv, "move_cmd");
   ros::NodeHandle n;
    ros::Subscriber sub_sr = n.subscribe("/move_cmd", 10, move_action);
+    ros::Subscriber sub = n.subscribe("/move_lock", 10, move_ctrl);
   vel_pub = n.advertise<geometry_msgs::Twist>("/cmd_vel", 10);
 
     ros::spin();
