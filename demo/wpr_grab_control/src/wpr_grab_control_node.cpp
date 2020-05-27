@@ -70,11 +70,16 @@ class GrabControl {
         STEP_FIND_PLANE,
         STEP_PLANE_DIST,
         STEP_FIND_OBJ,
+        //STEP_FIND_PLAC: 寻找、检查放置位置情况
+        STEP_FIND_PLACE,
         STEP_OBJ_DIST,
         STEP_HAND_UP,
         STEP_FORWARD,
         STEP_GRAB,
+        STEP_RELEASE,
         STEP_OBJ_UP,
+        //STEP_OBJ_FREE: 此时机械臂已离开目标
+        STEP_OBJ_FREE,
         STEP_BACKWARD,
         STEP_DONE,
         STEP_EXCEPTION
@@ -164,7 +169,15 @@ public:
         return true;
     }
 
+    //3.5、确定物品释放位置 
+    //当物品释放位置不合适or物品和桌子边缘的距离不合适时返回false, 进入异常状态
+    bool stepFindPlace() {
+        //TODO
+        return false;
+    }
+
     //4、左右平移对准目标物品
+    //左右平移对准
     bool stepObjectDist() {
         float vx, vy;
         vx = (fMoveTargetX - pose_diff.x) / 2;
@@ -218,6 +231,14 @@ public:
         return true;
     }
 
+    //7.5、 松开机械臂
+    bool stepRelease() {
+        jointControl->gripper(grabGripperValue + 0.05);
+        VelCmd(0, 0, 0);
+        ros::Duration(1.0).sleep();
+        return true;
+    }
+
     //8、拿起物品
     bool stepObjUp() {
         jointControl->lift(jointControl->getLift() + 0.03);
@@ -228,7 +249,14 @@ public:
         return true;
     }
 
+    //8.5、放下物品，收回机械臂
+    bool stepObjFree() {
+        //TODO
+        return true;
+    }
+
     //9、带着物品后退
+    //后退
     bool stepBackward() {
         float vx, vy;
         vx = (fMoveTargetX - pose_diff.x) / 2;
@@ -246,7 +274,7 @@ public:
         }
         return false;
     }
-
+    
     void grab(const BoxMarker &boxPlane, const BoxMarker &boxLastObject) {
         this->boxPlane = boxPlane;
         this->boxLastObject = boxLastObject;
@@ -269,12 +297,14 @@ public:
                     nStep = stepObjectDist() ? STEP_HAND_UP : STEP_OBJ_DIST;
                     break;
                 case STEP_HAND_UP:
+                    //TODO
                     nStep = STEP_FORWARD;
                     break;
                 case STEP_FORWARD:
                     nStep = stepForward() ? STEP_GRAB : STEP_FORWARD;
                     break;
                 case STEP_GRAB:
+                    //此处应添加抓取动作
                     nStep = STEP_OBJ_UP;
                     break;
                 case STEP_OBJ_UP:
@@ -283,8 +313,16 @@ public:
                 case STEP_BACKWARD:
                     nStep = STEP_DONE;
                     break;
+                // 以下几个状态不应在GRAB()中出现，因此转移为EXCEPTION状态
+                case STEP_FIND_PLACE:
+                case STEP_RELEASE:
+                case STEP_OBJ_FREE:
+                    nStep = STEP_EXCEPTION;
+                    break;
                 case STEP_DONE:
+                    break;
                 case STEP_EXCEPTION:
+                    //TODO?
                     break;
             }
             ros::Duration(0.5).sleep();
@@ -292,8 +330,63 @@ public:
         nStep = STEP_WAIT;
     }
 
-    void release() {
-        // TODO
+
+    //此处 boxPlane为目标放置平面，boxLastObject为目标放置位置
+    void release(const BoxMarker &boxPlane, const BoxMarker &boxLastObject) {
+        this->boxPlane = boxPlane;
+        this->boxLastObject = boxLastObject;
+        while (nStep != STEP_DONE && nStep != STEP_EXCEPTION) {
+            ROS_INFO("nStep: %d", nStep);
+            switch (nStep) {
+                case STEP_WAIT:
+                    nStep = STEP_FIND_PLANE;
+                    break;
+                case STEP_FIND_PLANE:
+                    nStep = STEP_PLANE_DIST;
+                    break;
+                case STEP_PLANE_DIST:
+                    nStep = stepPlaneDist() ? STEP_FIND_OBJ : STEP_PLANE_DIST;
+                    break;
+                case STEP_FIND_PLACE:
+                    nStep = stepFindPlace() ? STEP_HAND_UP : STEP_EXCEPTION;
+                    break;
+                //Release 应该先HAND_UP再对准
+                 case STEP_HAND_UP:
+                    //TODO
+                    nStep = STEP_OBJ_DIST;
+                    break;
+                case STEP_OBJ_DIST:
+                    nStep = stepObjectDist() ? STEP_HAND_UP : STEP_FORWARD;
+                    break;
+                case STEP_FORWARD:
+                    nStep = stepForward() ? STEP_RELEASE : STEP_FORWARD;
+                    break;
+                case STEP_RELEASE:
+                    //此处暂用释放动作
+                    nStep = stepRelease() ? STEP_OBJ_UP : STEP_OBJ_FREE;
+                    break;
+                case STEP_OBJ_FREE:
+                    nStep = STEP_BACKWARD;
+                    break;
+                case STEP_BACKWARD:
+                    nStep = STEP_DONE;
+                    break;
+                // 以下几个状态不应在RELEASE()中出现，因此转移为EXCEPTION状态
+                case STEP_FIND_OBJ:
+                case STEP_GRAB:
+                case STEP_OBJ_UP:
+                    nStep = STEP_EXCEPTION;
+                    break;
+                case STEP_DONE:
+                    break;
+                case STEP_EXCEPTION:
+                //TODO?
+                    ROS_WARN("ERROR IN RELEASE");
+                    break;
+            }
+            ros::Duration(0.5).sleep();
+        }
+        nStep = STEP_WAIT;
     }
 
     void init(ros::NodeHandle &nh) {
