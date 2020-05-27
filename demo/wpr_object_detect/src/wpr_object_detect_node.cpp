@@ -11,8 +11,8 @@
 #include <std_msgs/String.h>
 #include <tf/transform_listener.h>
 #include <visualization_msgs/Marker.h>
-#include "draw_utils.h"
-#include "object_detect.h"
+#include "wpr_object_detect/draw_utils.h"
+#include "wpr_object_detect/object_detect.h"
 #include <std_msgs/Float32MultiArray.h>
 
 static int nCount = 0;
