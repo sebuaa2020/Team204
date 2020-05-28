@@ -71,6 +71,7 @@ void ProcCloudCB(const sensor_msgs::PointCloud2 &input) {
     r = objectDetect.detectPlane(cloud_plane);
     if (!r) {
         ROS_WARN("Plane not detected");
+        drawUtils->RemoveBoxes();
         return;
     }
 
@@ -83,11 +84,11 @@ void ProcCloudCB(const sensor_msgs::PointCloud2 &input) {
     r = objectDetect.detectObject(clusters_cloud);
     drawUtils->RemoveBoxes();
 
-    drawUtils->DrawBox(boxMarker);
     if (!r) {
         ROS_WARN("Object not detected");
         return;
     }
+    drawUtils->DrawBox(boxMarker);
     boxMsg.data.clear();
     int j = 0;
     for (const auto &cluster : clusters_cloud) {
