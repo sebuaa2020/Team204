@@ -270,7 +270,6 @@ GrabControl::State GrabControl::grab(BoxMarker *boxPlane, BoxMarker *boxLastObje
                 nStep = STEP_EXCEPTION;
                 break;
         }
-        ros::Duration(0.5).sleep();
     }
     return nStep;
 }
@@ -334,7 +333,6 @@ GrabControl::State GrabControl::release(BoxMarker *boxPlane, BoxMarker *boxLastO
                 ROS_WARN("ERROR IN RELEASE");
                 break;
         }
-        ros::Duration(0.5).sleep();
     }
     return nStep;
 }
@@ -348,4 +346,8 @@ void GrabControl::init(ros::NodeHandle &nh) {
 
 void GrabControl::PoseDiffCallback(const geometry_msgs::Pose2D::ConstPtr &msg) {
     ROS_INFO("x=%f y=%f theta=%f", msg->x, msg->y, msg->theta);
+}
+
+GrabControl::State GrabControl::getState() {
+    return nStep;
 }

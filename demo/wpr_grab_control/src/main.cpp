@@ -134,6 +134,7 @@ int main(int argc, char **args) {
                 ROS_WARN("STEP_EXCEPTION");
                 break;
             }
+            ros::Duration(0.5).sleep();
         }
         ros::spinOnce();
     }

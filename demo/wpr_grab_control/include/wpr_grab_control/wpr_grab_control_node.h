@@ -133,6 +133,8 @@ namespace wpr_grab_control_node {
         void init(ros::NodeHandle &nh);
 
         void PoseDiffCallback(const geometry_msgs::Pose2D::ConstPtr &msg);
+
+        State getState();
     };
 }
 
