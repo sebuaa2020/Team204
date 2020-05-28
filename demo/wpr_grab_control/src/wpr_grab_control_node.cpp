@@ -14,113 +14,14 @@
 
 using namespace wpr_grab_control_node;
 
-static float grabHorizontalOffset;
-static float grabLiftOffset;
-static float grabForwardOffset;
-static float grabGripperValue;
-
-class WPRJointControl : public JointControl {
-private:
-    ros::Publisher mani_ctrl_pub;
-    sensor_msgs::JointState ctrl_msg;
-
-public:
-    void init(ros::NodeHandle &nh) {
-        mani_ctrl_pub = nh.advertise<sensor_msgs::JointState>("/wpb_home/mani_ctrl", 30);
-        mani_ctrl_pub.publish(ctrl_msg);
-    }
-
-    WPRJointControl() {
-        ctrl_msg.name.resize(2);
-        ctrl_msg.position.resize(2);
-        ctrl_msg.velocity.resize(2);
-        ctrl_msg.name[0] = "lift";
-        ctrl_msg.name[1] = "gripper";
-        ctrl_msg.position[0] = 0;
-        ctrl_msg.position[1] = 0.16;
-        ctrl_msg.velocity[0] = 0.5;
-        ctrl_msg.velocity[1] = 5;
-    }
-
-    double getLift() {
-        return ctrl_msg.position[0];
-    }
-
-    double getGripper() {
-        return ctrl_msg.position[1];
-    }
-
-    void lift(double liftValue) {
-        ctrl_msg.position[0] = liftValue;
-        mani_ctrl_pub.publish(ctrl_msg);
-    }
-
-    void gripper(double gripperValue) {
-        ctrl_msg.position[1] = gripperValue;
-        mani_ctrl_pub.publish(ctrl_msg);
-    }
-};
-
-
-class GrabControl {
-public:
-    enum State {
-        STEP_WAIT,
-        STEP_FIND_PLANE,
-        STEP_PLANE_DIST,
-        STEP_FIND_OBJ,
-        //STEP_FIND_PLAC: 寻找、检查放置位置情况
-        STEP_FIND_PLACE,
-        STEP_OBJ_DIST,
-        STEP_HAND_UP,
-        STEP_FORWARD,
-        STEP_GRAB,
-        STEP_RELEASE,
-        STEP_OBJ_UP,
-        //STEP_OBJ_FREE: 此时机械臂已离开目标
-        STEP_OBJ_FREE,
-        STEP_BACKWARD,
-        STEP_DONE,
-        STEP_EXCEPTION
-    };
-
-private:
-    State nStep;
-    std::shared_ptr<JointControl> jointControl;
-
-    ros::Publisher ctrl_pub;
-    std_msgs::String ctrl_msg;
-
-    ros::Publisher vel_pub;
-
-    ros::Subscriber pose_diff_sub;
-    geometry_msgs::Pose2D pose_diff;
-
-    BoxMarker *boxLastObject;
-    BoxMarker *boxPlane;
-
-    float fObjGrabX;
-    float fObjGrabY;
-    float fObjGrabZ;
-    float fMoveTargetX;
-    float fMoveTargetY;
-    float fPlaneDist;
-
-    float fTargetPlaneDist;
-    float fTargetGrabX;
-    float fTargetGrabY;
-
-    float fPlaneHeight;
-
-public:
-    GrabControl(const std::shared_ptr<JointControl> &jointControl) : jointControl(jointControl) {
+GrabControl::GrabControl(const std::shared_ptr<JointControl> &jointControl) : jointControl(jointControl) {
         fTargetPlaneDist = 0.6;
         fTargetGrabX = 0.8;
         fTargetGrabY = 0.0;
         nStep = STEP_WAIT;
     }
 
-    void VelCmd(float inVx, float inVy, float inTz) {
+    void GrabControl::VelCmd(float inVx, float inVy, float inTz) {
         geometry_msgs::Twist vel_cmd;
         vel_cmd.linear.x = inVx;
         vel_cmd.linear.y = inVy;
@@ -129,7 +30,7 @@ public:
     }
 
     //2、前后运动控制到平面的距离
-    bool stepPlaneDist() {
+    bool GrabControl::stepPlaneDist() {
 //        float fMinDist = 100;
         fPlaneDist = boxPlane->xMin;
         ROS_WARN("[PLANE_DIST] dist= %.2f", fPlaneDist);
@@ -150,7 +51,7 @@ public:
     }
 
     //3、检测物品，挑选出准备抓取的目标物品
-    bool stepFindObject() {
+    bool GrabControl::stepFindObject() {
         VelCmd(0, 0, 0);
         ctrl_msg.data = "pose_diff reset";
         ctrl_pub.publish(ctrl_msg);
@@ -171,16 +72,16 @@ public:
         return true;
     }
 
-    //3.5、确定物品释放位置 
+    //3.5、确定物品释放位置
     //当物品释放位置不合适or物品和桌子边缘的距离不合适时返回false, 进入异常状态
-    bool stepFindPlace() {
+    bool GrabControl::stepFindPlace() {
         //TODO
         return false;
     }
 
     //4、左右平移对准目标物品
     //左右平移对准
-    bool stepObjectDist() {
+    bool GrabControl::stepObjectDist() {
 #if defined(HAVE_POS_DIFF)
         float vx, vy;
         vx = (fMoveTargetX - pose_diff.x) / 2;
@@ -214,7 +115,7 @@ public:
     }
 
     //5、抬起手臂
-    bool stepHandUp() {
+    bool GrabControl::stepHandUp() {
         jointControl->lift(fPlaneHeight + grabLiftOffset);
         jointControl->gripper(0.16);
         ros::Duration(1.0).sleep();
@@ -226,7 +127,7 @@ public:
     }
 
     //6、前进靠近物品
-    bool stepForward() {
+    bool GrabControl::stepForward() {
 #if defined(HAVE_POS_DIFF)
         float vx, vy;
         vx = (fMoveTargetX - pose_diff.x) / 2;
@@ -259,7 +160,7 @@ public:
     }
 
     //7、抓取物品
-    bool stepGrab() {
+    bool GrabControl::stepGrab() {
         jointControl->gripper(grabGripperValue);
         VelCmd(0, 0, 0);
         ros::Duration(1.0).sleep();
@@ -267,7 +168,7 @@ public:
     }
 
     //7.5、 松开机械臂
-    bool stepRelease() {
+    bool GrabControl::stepRelease() {
         jointControl->gripper(grabGripperValue + 0.05);
         VelCmd(0, 0, 0);
         ros::Duration(1.0).sleep();
@@ -275,7 +176,7 @@ public:
     }
 
     //8、拿起物品
-    bool stepObjUp() {
+    bool GrabControl::stepObjUp() {
         jointControl->lift(jointControl->getLift() + 0.03);
         VelCmd(0, 0, 0);
         ros::Duration(1.0).sleep();
@@ -285,14 +186,14 @@ public:
     }
 
     //8.5、放下物品，收回机械臂
-    bool stepObjFree() {
+    bool GrabControl::stepObjFree() {
         //TODO
         return true;
     }
 
     //9、带着物品后退
     //后退
-    bool stepBackward() {
+    bool GrabControl::stepBackward() {
 #if defined(HAVE_POS_DIFF)
         float vx, vy;
         vx = (fMoveTargetX - pose_diff.x) / 2;
@@ -315,11 +216,11 @@ public:
 #endif
     }
 
-    void reset() {
+    void GrabControl::reset() {
         nStep = STEP_WAIT;
     }
 
-    State grab(BoxMarker *boxPlane, BoxMarker *boxLastObject) {
+GrabControl::State GrabControl::grab(BoxMarker *boxPlane, BoxMarker *boxLastObject) {
         this->boxPlane = boxPlane;
         this->boxLastObject = boxLastObject;
         if (nStep != STEP_DONE && nStep != STEP_EXCEPTION) {
@@ -376,7 +277,7 @@ public:
 
 
     //此处 boxPlane为目标放置平面，boxLastObject为目标放置位置
-    State release(BoxMarker *boxPlane, BoxMarker *boxLastObject) {
+    GrabControl::State GrabControl::release(BoxMarker *boxPlane, BoxMarker *boxLastObject) {
         this->boxPlane = boxPlane;
         this->boxLastObject = boxLastObject;
         if (nStep != STEP_DONE && nStep != STEP_EXCEPTION) {
@@ -438,95 +339,13 @@ public:
         return nStep;
     }
 
-    void init(ros::NodeHandle &nh) {
+    void GrabControl::init(ros::NodeHandle &nh) {
         ctrl_pub = nh.advertise<std_msgs::String>("/wpb_home/ctrl", 30);
         vel_pub = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 30);
         pose_diff_sub = nh.subscribe("/wpb_home/pose_diff", 1, &GrabControl::PoseDiffCallback,
                                      this);
     }
 
-    void PoseDiffCallback(const geometry_msgs::Pose2D::ConstPtr &msg) {
+    void GrabControl::PoseDiffCallback(const geometry_msgs::Pose2D::ConstPtr &msg) {
         ROS_INFO("x=%f y=%f theta=%f", msg->x, msg->y, msg->theta);
     }
-};
-
-static BoxMarker boxLastObject;
-static BoxMarker boxPlane;
-
-bool unpackBoxMsg(const std_msgs::Float32MultiArray::ConstPtr &msg, BoxMarker &box, int idx) {
-    if (msg->data.empty()) {
-        return false;
-    }
-    if (msg->data.size() % 6 != 0) {
-        return false;
-    }
-    if (idx < 0 || idx >= msg->data.size() / 6) {
-        return false;
-    }
-    int i = idx * 6;
-    box.xMin = msg->data[i + 0];
-    box.xMax = msg->data[i + 1];
-    box.yMin = msg->data[i + 2];
-    box.yMax = msg->data[i + 3];
-    box.zMin = msg->data[i + 4];
-    box.zMax = msg->data[i + 5];
-    return true;
-}
-
-bool foundPlane = false;
-
-void boxLastObjectCB(const std_msgs::Float32MultiArray::ConstPtr &msg) {
-    if (!unpackBoxMsg(msg, boxLastObject, 0)) {
-        ROS_INFO("[boxLastObjectCB] No object");
-        return;
-    }
-    if (!foundPlane) {
-        ROS_INFO("[boxLastObjectCB] No plane");
-        return;
-    }
-    ROS_INFO("[boxLastObjectCB] Get object");
-}
-
-void boxPlaneCB(const std_msgs::Float32MultiArray::ConstPtr &msg) {
-    foundPlane = false;
-    if (!unpackBoxMsg(msg, boxPlane, 0)) {
-        ROS_INFO("[boxPlaneCB] No plane");
-        return;
-    }
-    ROS_INFO("[boxPlaneCB] Get plane");
-    foundPlane = true;
-}
-
-int main(int argc, char **args) {
-    ros::init(argc, args, "wpr_grab_control_node");
-    ros::NodeHandle nh;
-    ROS_INFO("wpr_grab_control_node start");
-    nh.param("grab_y_offset", grabHorizontalOffset, 0.0f);
-    nh.param("grab_lift_offset", grabLiftOffset, 0.0f);
-    nh.param("grab_forward_offset", grabForwardOffset, 0.0f);
-    nh.param("grab_gripper_value", grabGripperValue, 0.035f);
-    ros::Subscriber plane_sub = nh.subscribe("/box_plane", 1, boxPlaneCB);
-    ros::Subscriber objects_sub = nh.subscribe("/box_objects", 1, boxLastObjectCB);
-    auto jointControl = std::make_shared<WPRJointControl>();
-    jointControl->init(nh);
-    auto grabControl = std::make_shared<GrabControl>(jointControl);
-    grabControl->init(nh);
-    grabControl->reset();
-
-    while (nh.ok()) {
-        if (foundPlane) {
-            auto st = grabControl->grab(&boxPlane, &boxLastObject);
-            if (st == GrabControl::STEP_DONE) {
-                ROS_WARN("STEP_DONE");
-                break;
-            }
-            if (st == GrabControl::STEP_EXCEPTION) {
-                ROS_WARN("STEP_EXCEPTION");
-                break;
-            }
-        }
-        ros::spinOnce();
-    }
-    grabControl->VelCmd(0, 0, 0);
-    return 0;
-}
