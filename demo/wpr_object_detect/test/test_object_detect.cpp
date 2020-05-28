@@ -46,6 +46,19 @@ TEST(TestSuite, testCase3) {
     EXPECT_EQ(0, clusters_cloud.size());
 }
 
+TEST(TestSuite, testCase4) {
+    pcl::PointCloud<PointT>::Ptr cloud(new pcl::PointCloud<PointT>);
+    pcl::PointCloud<PointT>::Ptr cloud_plane(new pcl::PointCloud<PointT>);
+    std::vector<pcl::PointCloud<PointT>> clusters_cloud;
+    pcl::PCDReader reader;
+    reader.read(home_dir + "/demo_ws/base_footprint/objects.pcd", *cloud);
+    objectDetect.setzLimits(2.0, 3.0);
+    objectDetect.setInputCloud(cloud);
+    EXPECT_FALSE(objectDetect.detectPlane(cloud_plane));
+    EXPECT_FALSE(objectDetect.detectObject(clusters_cloud));
+    EXPECT_EQ(0, clusters_cloud.size());
+}
+
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
     home_dir = std::string(getenv("HOME"));
