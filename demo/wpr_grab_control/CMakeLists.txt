@@ -198,7 +198,7 @@ target_link_libraries(${PROJECT_NAME}_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-catkin_add_gtest(${PROJECT_NAME}-test test/test_wpr_grab_control.cpp)
+catkin_add_gtest(${PROJECT_NAME}-test test/test_wpr_grab_control.cpp src/wpr_grab_control_node.cpp)
 if(TARGET ${PROJECT_NAME}-test)
   target_link_libraries(${PROJECT_NAME}-test ${catkin_LIBRARIES})
 endif()
