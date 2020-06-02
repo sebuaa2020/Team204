@@ -76,7 +76,7 @@ bool GrabControl::stepFindObject() {
 //当物品释放位置不合适or物品和桌子边缘的距离不合适时返回false, 进入异常状态
 bool GrabControl::stepFindPlace() {
     //TODO
-    return false;
+    return true;
 }
 
 //4、左右平移对准目标物品
@@ -114,6 +114,28 @@ bool GrabControl::stepObjectDist() {
 #endif
 }
 
+//左右平移对准桌子中心
+bool GrabControl::stepPlaneAdjustY() {
+#if defined(HAVE_POS_DIFF)
+    // TODO
+    return false;
+#else
+    float diff = (boxPlane->yMin + boxPlane->yMax) / 2;
+    if (fabs(diff) < 0.02) {
+        VelCmd(0, 0, 0);
+        return true;
+    } else {
+        if (diff > 0) {
+            VelCmd(0, 0.1, 0);
+        } else {
+            VelCmd(0, -0.1, 0);
+        }
+        return false;
+    }
+    return false;
+#endif
+}
+
 //5、抬起手臂
 bool GrabControl::stepHandUp() {
     jointControl->lift(fPlaneHeight + grabLiftOffset);
@@ -143,7 +165,7 @@ bool GrabControl::stepForward() {
     }
     return false;
 #else
-    float diff = (boxLastObject->xMin - 0.55 + grabForwardOffset) / 2;
+    float diff = (boxLastObject->xMin - 0.55 + grabForwardOffset);
     if (fabs(diff) < 0.02) {
         VelCmd(0, 0, 0);
         return true;
@@ -211,7 +233,8 @@ bool GrabControl::stepBackward() {
     }
     return false;
 #else
-    // Not implemented
+    VelCmd(-0.1, 0, 0);
+    ros::Duration(1.0).sleep();
     return true;
 #endif
 }
@@ -297,14 +320,15 @@ GrabControl::State GrabControl::release(BoxMarker *boxPlane, BoxMarker *boxLastO
                 //Release 应该先HAND_UP再对准
             case STEP_HAND_UP:
                 //TODO
-                stepHandUp();
+                stepObjUp();
                 nStep = STEP_OBJ_DIST;
                 break;
             case STEP_OBJ_DIST:
-                nStep = stepObjectDist() ? STEP_FORWARD : STEP_OBJ_DIST;
+                nStep = stepPlaneAdjustY() ? STEP_FORWARD : STEP_OBJ_DIST;
                 break;
             case STEP_FORWARD:
-                nStep = stepForward() ? STEP_RELEASE : STEP_FORWARD;
+//                nStep = stepForward() ? STEP_RELEASE : STEP_FORWARD;
+                nStep = STEP_RELEASE;
                 break;
             case STEP_RELEASE:
                 //此处暂用释放动作
@@ -315,7 +339,7 @@ GrabControl::State GrabControl::release(BoxMarker *boxPlane, BoxMarker *boxLastO
                 nStep = STEP_BACKWARD;
                 break;
             case STEP_BACKWARD:
-                stepBackward();
+//                stepBackward();
                 nStep = STEP_DONE;
                 break;
                 // 以下几个状态不应在RELEASE()中出现，因此转移为EXCEPTION状态

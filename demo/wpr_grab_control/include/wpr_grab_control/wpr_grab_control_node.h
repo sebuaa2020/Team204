@@ -122,6 +122,9 @@ namespace wpr_grab_control_node {
         //后退
         bool stepBackward();
 
+        //左右平移对准桌子中心
+        bool stepPlaneAdjustY();
+
         void reset();
 
         State grab(BoxMarker *boxPlane, BoxMarker *boxLastObject);
