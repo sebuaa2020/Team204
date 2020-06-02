@@ -66,12 +66,6 @@ int main(int argc, char** argv)
                 exp.description = "succeeded";
                 pub.publish(exp);
                 state = S_IDLE;
-            } else if (goalState == actionlib::SimpleClientGoalState::REJECTED) {
-                ROS_INFO("[navigation] goal rejected.");
-                exp.type = exp.NAV_REJECTED;
-                exp.description = "rejected.";
-                pub.publish(exp);
-                state = S_IDLE;
             } else if (goalState == actionlib::SimpleClientGoalState::ABORTED) {
                 exp.type = exp.NAV_UNREACHABLE;
                 ROS_INFO("[navigation] goal unreachable.");
