@@ -160,7 +160,18 @@ int main(int argc, char **args) {
                 }
             }
         } else if (curCmd == GRABCMD_RELEASE) {
-
+            if (foundPlane) {
+                auto st = grabControl->release(&boxPlane, &boxLastObject);
+                if (st == GrabControl::STEP_DONE) {
+                    ROS_WARN("STEP_DONE");
+                    curCmd = GRABCMD_STOP;
+                } else if (st == GrabControl::STEP_EXCEPTION) {
+                    ROS_WARN("STEP_EXCEPTION");
+                    curCmd = GRABCMD_STOP;
+                } else {
+                    ros::Duration(0.5).sleep();
+                }
+            }
         } else {
             grabControl->reset();
             grabControl->VelCmd(0, 0, 0);
