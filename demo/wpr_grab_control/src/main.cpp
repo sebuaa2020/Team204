@@ -89,7 +89,7 @@ void boxLastObjectCB(const std_msgs::Float32MultiArray::ConstPtr &msg) {
         ROS_INFO("[boxLastObjectCB] No plane");
         return;
     }
-    ROS_INFO("[boxLastObjectCB] Get object");
+//    ROS_INFO("[boxLastObjectCB] Get object");
 }
 
 void boxPlaneCB(const std_msgs::Float32MultiArray::ConstPtr &msg) {
@@ -98,8 +98,28 @@ void boxPlaneCB(const std_msgs::Float32MultiArray::ConstPtr &msg) {
         ROS_INFO("[boxPlaneCB] No plane");
         return;
     }
-    ROS_INFO("[boxPlaneCB] Get plane");
+//    ROS_INFO("[boxPlaneCB] Get plane");
     foundPlane = true;
+}
+
+enum GrabCMD {
+    GRABCMD_STOP,
+    GRABCMD_GRAB,
+    GRABCMD_RELEASE
+};
+
+GrabCMD curCmd;
+
+void cmdCB(const std_msgs::String::ConstPtr &msg) {
+    if (msg->data.find("grab") != std::string::npos) {
+        curCmd = GRABCMD_GRAB;
+    } else if (msg->data.find("release") != std::string::npos) {
+        curCmd = GRABCMD_RELEASE;
+    } else if (msg->data.find("stop") != std::string::npos) {
+        curCmd = GRABCMD_STOP;
+    } else {
+        ROS_WARN("Unknown command: %s", msg->data.c_str());
+    }
 }
 
 float GrabControl::grabHorizontalOffset;
@@ -117,24 +137,33 @@ int main(int argc, char **args) {
     nh.param("grab_gripper_value", GrabControl::grabGripperValue, 0.035f);
     ros::Subscriber plane_sub = nh.subscribe("/box_plane", 1, boxPlaneCB);
     ros::Subscriber objects_sub = nh.subscribe("/box_objects", 1, boxLastObjectCB);
+    ros::Subscriber cmd_sub = nh.subscribe("/do_grab", 0, cmdCB);
     auto jointControl = std::make_shared<WPRJointControl>();
     jointControl->init(nh);
     auto grabControl = std::make_shared<GrabControl>(jointControl);
     grabControl->init(nh);
     grabControl->reset();
+    curCmd = GRABCMD_STOP;
 
     while (nh.ok()) {
-        if (foundPlane) {
-            auto st = grabControl->grab(&boxPlane, &boxLastObject);
-            if (st == GrabControl::STEP_DONE) {
-                ROS_WARN("STEP_DONE");
-                break;
+        if (curCmd == GRABCMD_GRAB) {
+            if (foundPlane) {
+                auto st = grabControl->grab(&boxPlane, &boxLastObject);
+                if (st == GrabControl::STEP_DONE) {
+                    ROS_WARN("STEP_DONE");
+                    curCmd = GRABCMD_STOP;
+                } else if (st == GrabControl::STEP_EXCEPTION) {
+                    ROS_WARN("STEP_EXCEPTION");
+                    curCmd = GRABCMD_STOP;
+                } else {
+                    ros::Duration(0.5).sleep();
+                }
             }
-            if (st == GrabControl::STEP_EXCEPTION) {
-                ROS_WARN("STEP_EXCEPTION");
-                break;
-            }
-            ros::Duration(0.5).sleep();
+        } else if (curCmd == GRABCMD_RELEASE) {
+
+        } else {
+            grabControl->reset();
+            grabControl->VelCmd(0, 0, 0);
         }
         ros::spinOnce();
     }
