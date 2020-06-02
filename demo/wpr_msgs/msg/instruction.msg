@@ -3,6 +3,8 @@ string description
 string argStr
 int32 argInt
 navGoal goalPose
+float32[] box_plane
+float32[] box_obj
 
 ###########################
 # 运动控制相关指令
@@ -35,20 +37,26 @@ int8 NAV_START = 17
 int8 NAV_CANCEL = 18
 
 ############################
+# 目标检测指令
+int8 OBJ_DETECT = 19
+
+############################
 # 目标抓取相关指令
-int8 GRAB_START = 19
+int8 GRAB_START = 20
 
 
 ############################
 # 障碍物检测相关指令
-int8 BARRIER_START = 20
-int8 BARRIER_END = 21
+int8 BARRIER_START = 21
+int8 BARRIER_END = 22
 
 
 ################################################
 # 异常处理
 int8 NAV_UNREACHABLE = 101
 int8 NAV_ARRIVED = 102
-int8 NAV_REJECTED = 103
+int8 NAV_STUCK = 103
+
+
 int8 MAP_DEL_ERROR = 104
 int8 MAP_LOAD_ERROR = 105
