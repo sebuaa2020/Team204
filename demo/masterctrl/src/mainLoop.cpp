@@ -508,7 +508,7 @@ int main(int argc, char* argv[])
     // init every Publisher
     navPuber = nh.advertise<geometry_msgs::PoseStamped>("navigation_ctrl", 1000);
     movePuber = nh.advertise<std_msgs::Int32>("inter_move", 1000);
-    mapPuber = nh.advertise<std_msgs::Int32>("map_manager", 1000);
+    mapPuber = nh.advertise<std_msgs::String>("map_manager", 1000);
     barrierPuber = nh.advertise<std_msgs::Int32>("barrier_switch", 1000);
 
     //TODO: rename the topic
