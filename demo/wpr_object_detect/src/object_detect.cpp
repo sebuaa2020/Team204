@@ -171,3 +171,7 @@ bool ObjectDetect::detectObject(std::vector<pcl::PointCloud<PointT>> &clusters_c
     }
     return true;
 }
+
+pcl::PointCloud<PointT>::Ptr ObjectDetect::getFilteredCloud() {
+    return cloud_filtered;
+}
