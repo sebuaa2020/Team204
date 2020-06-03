@@ -138,15 +138,14 @@ void map_unload()
 
 void start_mapping()
 {
-    system("roslaunch vel_pkg ros_mapping.launch");
+    system("roslaunch slam_sim_demo gmapping_demo.launch");
+    system("roslaunch slam_sim_demo view_slam.launch");
 }
 
 void end_mapping()
 {
-    std_msgs::String msg;
-    system("rosnode kill joint_state_publisher");
-    system("rosnode kill hector_mapping");
-    system("rosnode kill lidar_filter");
+    system("rosnode kill /rviz");
+    system("rosnode kill /slam_gmapping");
 }
 
 void pub_move(int command)
