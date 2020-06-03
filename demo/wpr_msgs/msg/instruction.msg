@@ -47,6 +47,10 @@ int8 RELEASE_START = 20
 int8 BARRIER_START = 21
 int8 BARRIER_END = 22
 
+############################
+# 语音控制相关指令
+int8 VOICE_START = 23
+int8 VOICE_END = 24
 
 ################################################
 # 异常处理

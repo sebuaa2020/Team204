@@ -221,7 +221,7 @@ void map_ctrl(const std_msgs::Int32::ConstPtr & msg)
 
 int main(int argc, char** argv)
 {
-    swit = false;
+    swit = true;
     ros::init(argc, argv, "map_manager");
   ros::NodeHandle n;
   ros::Subscriber sub_sr = n.subscribe("/map_switch", 10, map_ctrl);

@@ -47,6 +47,7 @@ static ros::Publisher navPuber;
 static ros::Publisher movePuber;
 static ros::Publisher mapPuber;
 static ros::Publisher barrierPuber;
+static ros::Publisher voicePuber;
 static ros::Publisher objDetectPuber;
 static ros::Publisher grubBoxPlanePuber;
 static ros::Publisher grubBoxObjPuber;
@@ -78,6 +79,20 @@ void end_barrier()
     std_msgs::Int32 msg;
     msg.data = 0;
     barrierPuber.publish(msg);
+}
+
+void start_voice()
+{
+    std_msgs::Int32 msg;
+    msg.data = 1;
+    voicePuber.publish(msg);
+}
+
+void end_voice()
+{
+    std_msgs::Int32 msg;
+    msg.data = 0;
+    voicePuber.publish(msg);
 }
 
 void map_save(string name)
@@ -363,9 +378,9 @@ void executeBarrier(const wpr_msgs::instruction& msg)
         case NOT_LOAD_MAP:
         case MAPPING:
         case IDLE:
-        case NAVIGATING:
             start_barrier();
             break;
+	case NAVIGATING:
         case GRABING:
             break;
         default:
@@ -377,9 +392,9 @@ void executeBarrier(const wpr_msgs::instruction& msg)
         case MAPPING:
         case NOT_LOAD_MAP:
         case IDLE:
-        case NAVIGATING:
             end_barrier();
             break;
+        case NAVIGATING:
         case GRABING:
             break;
         default:
@@ -390,6 +405,42 @@ void executeBarrier(const wpr_msgs::instruction& msg)
         ROS_INFO("unrecognized msg in executeMappingCtrl");
     }
 }
+
+void executeVoice(const wpr_msgs::instruction& msg)
+{
+    if (msg.type == wpr_msgs::instruction::VOICE_START) {
+        switch (state) {
+        case NOT_LOAD_MAP:
+        case MAPPING:
+        case IDLE:
+            start_voice();
+            break;
+	case NAVIGATING:
+        case GRABING:
+            break;
+        default:
+            ROS_INFO("unrecognized state");
+            break;
+        }
+    } else if (msg.type == wpr_msgs::instruction::VOICE_END) {
+        switch (state) {
+        case MAPPING:
+        case NOT_LOAD_MAP:
+        case IDLE:
+            end_voice();
+            break;
+        case NAVIGATING:
+        case GRABING:
+            break;
+        default:
+            ROS_INFO("unrecognized state");
+            break;
+        }
+    } else {
+        ROS_INFO("unrecognized msg in executeMappingCtrl");
+    }
+}
+
 
 void exceptionMapdel(const wpr_msgs::instruction& msg)
 {
@@ -465,6 +516,10 @@ void subCallback(const wpr_msgs::instruction& msg)
     case wpr_msgs::instruction::BARRIER_END:
         executeBarrier(msg);
         break;
+    case wpr_msgs::instruction::VOICE_START:
+    case wpr_msgs::instruction::VOICE_END:
+        executeVoice(msg);
+        break;
     //exception
     case wpr_msgs::instruction::NAV_UNREACHABLE:
     case wpr_msgs::instruction::NAV_ARRIVED:
@@ -494,6 +549,7 @@ int main(int argc, char* argv[])
     movePuber = nh.advertise<std_msgs::Int32>("inter_move", 1000);
     mapPuber = nh.advertise<std_msgs::String>("map_manager", 1000);
     barrierPuber = nh.advertise<std_msgs::Int32>("barrier_switch", 1000);
+    barrierPuber = nh.advertise<std_msgs::Int32>("voice_switch", 1000);
 
     //TODO: rename the topic
     objDetectPuber = nh.advertise<sensor_msgs::PointCloud2>("/cloud_pub", 1000);
