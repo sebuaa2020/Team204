@@ -18,6 +18,7 @@ def init(interval=1):
     time.sleep(interval)
     rospy.loginfo('talker init done.')
 
+
 def base(type_, description, loginfo=True, publish=True):
     msg = instruction()
     msg.type = type_
@@ -148,6 +149,14 @@ def barrier_start():
 
 def barrier_end():
     base(instruction.BARRIER_END, 'barrier detect disable')
+
+
+def voice_start():
+    base(instruction.VOICE_START, 'voice control movement')
+
+
+def voice_end():
+    base(instruction.VOICE_END, 'voice control disable')
 
 
 if __name__ == '__main__':
