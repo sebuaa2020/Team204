@@ -100,6 +100,25 @@ TEST(TestSuite, testInitial) {
     EXPECT_EQ(GrabControl::STEP_WAIT, grabControl->getState());
 }
 
+TEST(TestSuite, testUnpack) {
+    static std::vector<float> data;
+    static BoxMarker box;
+    EXPECT_FALSE(unpackBoxMsg(data, box, 0));
+    data.push_back(0);
+    EXPECT_FALSE(unpackBoxMsg(data, box, 0));
+    data.clear();
+    for (int i = 0; i < 7; i++) {
+        data.push_back(0);
+    }
+    EXPECT_FALSE(unpackBoxMsg(data, box, 0));
+    data.clear();
+    for (int i = 0; i < 6; i++) {
+        data.push_back(i);
+    }
+    EXPECT_TRUE(unpackBoxMsg(data, box, 0));
+    EXPECT_FALSE(unpackBoxMsg(data, box, 1));
+}
+
 TEST(TestSuite, testCase1) {
     EXPECT_TRUE(unpackBoxMsg(PlaneData, boxPlane, 0));
     EXPECT_TRUE(unpackBoxMsg(ObjectData, boxLastObject, 0));
@@ -143,6 +162,27 @@ TEST(TestSuite, testCase1) {
 
     st = grabControl->grab(&boxPlane, &boxLastObject);
     EXPECT_EQ(GrabControl::STEP_FORWARD, st);
+
+    st = grabControl->grab(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_FORWARD, st);
+
+    diff = (boxLastObject.xMin - 0.55);
+    boxPlane.xMin -= diff;
+    boxPlane.xMax -= diff;
+    boxLastObject.xMin -= diff;
+    boxLastObject.xMax -= diff;
+
+    st = grabControl->grab(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_GRAB, st);
+
+    st = grabControl->grab(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_OBJ_UP, st);
+
+    st = grabControl->grab(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_BACKWARD, st);
+
+    st = grabControl->grab(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_DONE, st);
 }
 
 TEST(TestSuite, testCase2) {
@@ -180,6 +220,56 @@ TEST(TestSuite, testCase2) {
 
     st = grabControl->grab(&boxPlane, &boxLastObject);
     EXPECT_EQ(GrabControl::STEP_EXCEPTION, st);
+}
+
+TEST(TestSuite, testCaseRelease1) {
+    EXPECT_TRUE(unpackBoxMsg(PlaneData, boxPlane, 0));
+    EXPECT_TRUE(unpackBoxMsg(ObjectData, boxLastObject, 0));
+
+    grabControl->reset();
+
+    auto st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_FIND_PLANE, st);
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_PLANE_DIST, st);
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_PLANE_DIST, st);
+
+    // Adjust X position
+    float diff = boxPlane.xMin - 0.6;
+    boxPlane.xMin -= diff;
+    boxPlane.xMax -= diff;
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_FIND_PLACE, st);
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_HAND_UP, st);
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_OBJ_DIST, st);
+
+    // Adjust Y position
+    diff = (boxPlane.yMin + boxPlane.yMax) / 2;
+    boxPlane.yMin -= diff;
+    boxPlane.yMax -= diff;
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_FORWARD, st);
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_RELEASE, st);
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_OBJ_FREE, st);
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_BACKWARD, st);
+
+    st = grabControl->release(&boxPlane, &boxLastObject);
+    EXPECT_EQ(GrabControl::STEP_DONE, st);
 }
 
 int main(int argc, char **argv) {

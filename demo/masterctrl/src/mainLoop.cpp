@@ -482,9 +482,6 @@ void subCallback(const wpr_msgs::instruction& msg)
     //exception
     case wpr_msgs::instruction::NAV_UNREACHABLE:
     case wpr_msgs::instruction::NAV_ARRIVED:
-    case wpr_msgs::instruction::NAV_REJECTED:
-        exceptionNavigation(msg);
-        break;
     case wpr_msgs::instruction::MAP_DEL_ERROR:
         exceptionMapdel(msg);
         break;
