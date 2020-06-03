@@ -36,14 +36,11 @@ int8 SAVE_MAP = 16
 int8 NAV_START = 17
 int8 NAV_CANCEL = 18
 
-############################
-# 目标检测指令
-int8 OBJ_DETECT = 19
 
 ############################
 # 目标抓取相关指令
-int8 GRAB_START = 20
-
+int8 GRAB_START = 19
+int8 RELEASE_START = 20
 
 ############################
 # 障碍物检测相关指令
