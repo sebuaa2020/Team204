@@ -126,6 +126,11 @@ void map_load(string name)
     string command = "load " + name;
     msg.data = command;
     mapPuber.publish(msg);
+
+    ros::Duration(1).sleep();
+    system("roslaunch wpr_navigation navigation_demo.launch &");
+    system("roslaunch wpr_navigation view_navigation.launch &");
+    system("rosrun wpr_navigation navigation &");
 }
 
 void map_unload()
@@ -134,6 +139,12 @@ void map_unload()
 
     msg.data = "unload";
     mapPuber.publish(msg);
+    
+    ros::Duration(1).sleep();
+    system("rosnode list | grep navgationManager | xargs -I {} rosnode kill {} &");
+    system("rosnode list | grep acml | xargs -I {} rosnode kill {} &");
+    system("rosnode list | grep move_base | xargs -I {} rosnode kill {} &");
+    system("rosnode list | grep rviz | xargs -I {} rosnode kill {} &");
 }
 
 void start_mapping()
