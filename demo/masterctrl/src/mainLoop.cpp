@@ -138,8 +138,8 @@ void map_unload()
 
 void start_mapping()
 {
-    system("roslaunch slam_sim_demo gmapping_demo.launch");
-    system("roslaunch slam_sim_demo view_slam.launch");
+    system("roslaunch slam_sim_demo gmapping_demo.launch &");
+    system("roslaunch slam_sim_demo view_slam.launch &");
 }
 
 void end_mapping()
@@ -291,6 +291,7 @@ void executeMapManage(const wpr_msgs::instruction& msg)
         case NOT_LOAD_MAP:
             map_load(msg.argStr);
             feedback2user("map loaded");
+            stateChangeTo(IDLE);
             break;
         case MAPPING:
             feedback2user("building map, please quit first and do again");
@@ -308,6 +309,7 @@ void executeMapManage(const wpr_msgs::instruction& msg)
         switch (state) {
         case IDLE:
             map_unload();
+            stateChangeTo(NOT_LOAD_MAP);
             feedback2user("map unloaded");
             break;
         case NOT_LOAD_MAP:
@@ -542,6 +544,7 @@ void subCallback(const wpr_msgs::instruction& msg)
         break;
     case wpr_msgs::instruction::LIST_MAP:
     case wpr_msgs::instruction::DELETE_MAP:
+    case wpr_msgs::instruction::SAVE_MAP:
     case wpr_msgs::instruction::LOAD_MAP:
     case wpr_msgs::instruction::UNLOAD_MAP:
         executeMapManage(msg);
@@ -567,6 +570,8 @@ void subCallback(const wpr_msgs::instruction& msg)
     //exception
     case wpr_msgs::instruction::NAV_UNREACHABLE:
     case wpr_msgs::instruction::NAV_ARRIVED:
+        exceptionNavigation(msg);
+        break;
     case wpr_msgs::instruction::MAP_DEL_ERROR:
         exceptionMapdel(msg);
         break;
