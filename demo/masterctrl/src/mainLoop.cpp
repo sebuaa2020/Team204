@@ -138,7 +138,7 @@ void map_unload()
 
 void start_mapping()
 {
-    system("roslaunch vel_pkg ros_mapping");
+    system("roslaunch vel_pkg ros_mapping.launch");
 }
 
 void end_mapping()
@@ -184,12 +184,16 @@ void executeMoveCtrl(const wpr_msgs::instruction& msg)
     case MAPPING:
     case IDLE:
         pub_move(msg.type);
+        feedback2user("manual control");
         break;
     case GRABING:
+        feedback2user("during grabing can't control manually");
+        break;
     case NAVIGATING:
+        feedback2user("during navigating can't control manually");
         break;
     default:
-        ROS_INFO("unrecognized state");
+        feedback2user("unrecognized state");
         break;
     }
 }
@@ -201,14 +205,18 @@ void executeMappingCtrl(const wpr_msgs::instruction& msg)
         case NOT_LOAD_MAP:
             start_mapping();
             stateChangeTo(MAPPING);
+            feedback2user("start to build map");
             break;
         case MAPPING:
+            feedback2user("buliding map, needn't open twice");
+            break;
         case GRABING:
         case IDLE:
         case NAVIGATING:
+            feedback2user("map loaded, please unload map and do again");
             break;
         default:
-            ROS_INFO("unrecognized state");
+            feedback2user("unrecognized state");
             break;
         }
     } else if (msg.type == wpr_msgs::instruction::MAPPING_END) {
@@ -216,11 +224,13 @@ void executeMappingCtrl(const wpr_msgs::instruction& msg)
         case MAPPING:
             end_mapping();
             stateChangeTo(NOT_LOAD_MAP);
+            feedback2user("end building map");
             break;
         case NOT_LOAD_MAP:
         case IDLE:
         case GRABING:
         case NAVIGATING:
+            feedback2user("not building map. needn't end it");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -237,11 +247,13 @@ void executeMapManage(const wpr_msgs::instruction& msg)
         switch (state) {
         case MAPPING:
             map_save(msg.argStr);
+            feedback2user("map saved");
             break;
         case GRABING:
         case IDLE:
         case NAVIGATING:
         case NOT_LOAD_MAP:
+            feedback2user("can't save map: not building map now");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -255,6 +267,7 @@ void executeMapManage(const wpr_msgs::instruction& msg)
         case IDLE:
         case NAVIGATING:
             map_list();
+            feedback2user("list all map");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -268,6 +281,7 @@ void executeMapManage(const wpr_msgs::instruction& msg)
         case IDLE:
         case NAVIGATING:
             map_del(msg.argStr);
+            feedback2user("delete map");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -277,11 +291,15 @@ void executeMapManage(const wpr_msgs::instruction& msg)
         switch (state) {
         case NOT_LOAD_MAP:
             map_load(msg.argStr);
+            feedback2user("map loaded");
             break;
         case MAPPING:
+            feedback2user("building map, please quit first and do again");
+            break;
         case IDLE:
         case GRABING:
         case NAVIGATING:
+            feedback2user("map loaded, needn't load");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -291,11 +309,17 @@ void executeMapManage(const wpr_msgs::instruction& msg)
         switch (state) {
         case IDLE:
             map_unload();
+            feedback2user("map unloaded");
             break;
         case NOT_LOAD_MAP:
+            feedback2user("unload failed: not load map before.");
+            break;
         case MAPPING:
+            feedback2user("unload failed: during building map");
+            break;
         case GRABING:
         case NAVIGATING:
+            feedback2user("unload failed: map is using");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -312,14 +336,20 @@ void executeNavigation(const wpr_msgs::instruction& msg)
         switch (state) {
         case NOT_LOAD_MAP:
         case MAPPING:
+            feedback2user("navigation failed: no map is load");
+            break;
         case GRABING:
-            /**/
-            ROS_INFO("the state doesn't allow navigation");
+            feedback2user("navigation failed: grab mission is taking control");
             break;
         case IDLE:
+            navStart(msg);
+            stateChangeTo(NAVIGATING);
+            feedback2user("start navigation");
+            break;
         case NAVIGATING:
             navStart(msg);
             stateChangeTo(NAVIGATING);
+            feedback2user("start new navigation");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -331,11 +361,12 @@ void executeNavigation(const wpr_msgs::instruction& msg)
         case MAPPING:
         case IDLE:
         case GRABING:
-            ROS_INFO("the state doesn't allow navigation");
+            feedback2user("no navigation mission is running");
             break;
         case NAVIGATING:
             navCancel();
             stateChangeTo(IDLE);
+            feedback2user("navigation mission cancelled");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -348,6 +379,9 @@ void executeNavigation(const wpr_msgs::instruction& msg)
 
 void executeGrab(const wpr_msgs::instruction& msg)
 {
+    feedback2user("grab mission can't be done: no robot arm");
+    return;
+
     switch (state) {
     case NOT_LOAD_MAP:
     case MAPPING:
@@ -380,9 +414,11 @@ void executeBarrier(const wpr_msgs::instruction& msg)
         case MAPPING:
         case IDLE:
             start_barrier();
+            feedback2user("barrier detect enable");
             break;
         case NAVIGATING:
         case GRABING:
+            feedback2user("barrier detect shouldn't enable during navigating and grabing");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -394,9 +430,11 @@ void executeBarrier(const wpr_msgs::instruction& msg)
         case NOT_LOAD_MAP:
         case IDLE:
             end_barrier();
+            feedback2user("barrier detect disable");
             break;
         case NAVIGATING:
         case GRABING:
+            feedback2user("barrier detect disable failed: shouldn't enable during navigating and grabing");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -415,9 +453,13 @@ void executeVoice(const wpr_msgs::instruction& msg)
         case MAPPING:
         case IDLE:
             start_voice();
+            feedback2user("voice listening");
             break;
         case NAVIGATING:
+            feedback2user("during navigating doesn't support listening");
+            break;
         case GRABING:
+            feedback2user("during grabing doesn't support listening");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -429,9 +471,13 @@ void executeVoice(const wpr_msgs::instruction& msg)
         case NOT_LOAD_MAP:
         case IDLE:
             end_voice();
+            feedback2user("end voice listening");
             break;
         case NAVIGATING:
+            feedback2user("during navigating doesn't support listening");
+            break;
         case GRABING:
+            feedback2user("during grabing doesn't support listening");
             break;
         default:
             ROS_INFO("unrecognized state");
@@ -444,6 +490,7 @@ void executeVoice(const wpr_msgs::instruction& msg)
 
 void exceptionMapdel(const wpr_msgs::instruction& msg)
 {
+    feedback2user("can't delete map");
     ROS_INFO("Can't delete map");
 }
 
@@ -453,7 +500,7 @@ void exceptionMapload(const wpr_msgs::instruction& msg)
         ROS_INFO("[exception] the exception shouldn't be published during this state");
     } else {
         if (msg.type == wpr_msgs::instruction::MAP_LOAD_ERROR) {
-            /**/
+            feedback2user("can't load map");
         }
         stateChangeTo(NOT_LOAD_MAP);
     }
@@ -465,12 +512,11 @@ void exceptionNavigation(const wpr_msgs::instruction& msg)
         ROS_INFO("[exception] the exception shouldn't be published during this state");
     } else {
         if (msg.type == wpr_msgs::instruction::NAV_UNREACHABLE) {
-            feedback2user("navigation goal unreachable");
-            ROS_WARN("nvaigation unreachable");
+            feedback2user("nvaigation unreachable");
         } else if (msg.type == wpr_msgs::instruction::NAV_ARRIVED) {
             feedback2user("navigation goal arrived");
         } else if (msg.type == wpr_msgs::instruction::NAV_STUCK) {
-            feedback2user("robot maybe got stuck");
+            feedback2user("fatal: robot map got stuck");
         }
         stateChangeTo(IDLE);
     }
@@ -544,7 +590,7 @@ int main(int argc, char* argv[])
 
     ros::NodeHandle nh;
     ros::Subscriber sub = nh.subscribe("instruction", 1000, subCallback);
-    ros::Publisher feedbackPuber = nh.advertise<std_msgs::String>("feedback2ui", 1000);
+    feedbackPuber = nh.advertise<std_msgs::String>("feedback2ui", 1000);
 
     // init every Publisher
     navPuber = nh.advertise<geometry_msgs::PoseStamped>("navigation_ctrl", 1000);
@@ -562,7 +608,7 @@ int main(int argc, char* argv[])
     grabCmdPuber = nh.advertise<std_msgs::String>("/do_grab", 1000);
 
     // init state
-    state = IDLE;
+    state = NOT_LOAD_MAP;
 
     ROS_INFO("listening to /instruction for command");
     ros::spin();
