@@ -31,8 +31,14 @@ void ObjectDetect::setInputCloud(pcl::PointCloud<PointT>::Ptr cloud) {
     pass.setInputCloud(cloud);
     pass.setFilterFieldName("x");
     pass.setFilterLimits(0.0, 1.5);
+    pass.filter(*cloud_filtered);
+
+    pass.setInputCloud(cloud_filtered);
     pass.setFilterFieldName("y");
-    pass.setFilterLimits(-1.5, 1.5);
+    pass.setFilterLimits(-1.0, 1.0);
+    pass.filter(*cloud_filtered);
+
+    pass.setInputCloud(cloud_filtered);
     pass.setFilterFieldName("z");
     pass.setFilterLimits(zPassThroughLimitMin, zPassThroughLimitMax);
     pass.filter(*cloud_filtered);
@@ -60,11 +66,11 @@ bool ObjectDetect::detectPlane(pcl::PointCloud<PointT>::Ptr cloud_plane) {
     seg.setOptimizeCoefficients(true);
     seg.setModelType(pcl::SACMODEL_PERPENDICULAR_PLANE);
     seg.setMethodType(pcl::SAC_RANSAC);
-    seg.setMaxIterations(100);
-    seg.setDistanceThreshold(0.03);
+    //seg.setMaxIterations(100);
+    seg.setDistanceThreshold(0.02);
     Eigen::Vector3f axis = Eigen::Vector3f(0.0, 0.0, 1.0);
     seg.setAxis(axis);
-    seg.setEpsAngle(15.0f * (M_PI / 180.0f));
+    seg.setEpsAngle(10.0f * (M_PI / 180.0f));
 
     int i = 0, nr_points = (int) cloud_filtered->points.size();
     while (cloud_filtered->points.size() > 0.5 * nr_points) {
