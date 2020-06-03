@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
+import time
 import rospy
 from wpr_msgs.msg import instruction
 
@@ -10,11 +11,12 @@ talk to master control node
 pub = None
 
 
-def init():
+def init(interval=1):
     global pub
     pub = rospy.Publisher('/instruction', instruction, queue_size=10)
     rospy.init_node('pytalker', anonymous=True)
-
+    time.sleep(interval)
+    rospy.loginfo('talker init done.')
 
 def base(type_, description, loginfo=True, publish=True):
     msg = instruction()
@@ -154,12 +156,4 @@ if __name__ == '__main__':
         nav_start(1.0, -2.0, 0.0)
 
     init()
-    rate = rospy.Rate(1)
-    x = 1.0
-    y = 2.0
-    state = 'working'
-    while not rospy.is_shutdown():
-        nav_start(x, 1.0, 2.0)
-        rate.sleep()
-        x += 1
-        
+    main()
