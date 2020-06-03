@@ -1,5 +1,6 @@
-from tkinter import *
-import tkinter.font as tkFont
+#coding=utf-8
+from Tkinter import *
+import tkFont
 import os
 import pytalker as pyt
 
