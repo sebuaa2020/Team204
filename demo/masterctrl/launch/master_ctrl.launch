@@ -14,5 +14,5 @@
     <node pkg="map_manager" type="map_manager" name="map_manager" output="screen"/>
 
     <!-- master -->
-    <node pkg="masterctrl" type="wpr_master_ctrl" name="wpr_master_ctrl" output="screen"/>
+    <!-- <node pkg="masterctrl" type="wpr_master_ctrl" name="wpr_master_ctrl" output="screen"/> -->
 </launch>
