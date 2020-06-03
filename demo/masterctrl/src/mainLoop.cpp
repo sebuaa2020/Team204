@@ -48,9 +48,7 @@ static ros::Publisher movePuber;
 static ros::Publisher mapPuber;
 static ros::Publisher barrierPuber;
 static ros::Publisher voicePuber;
-static ros::Publisher objDetectPuber;
-static ros::Publisher grubBoxPlanePuber;
-static ros::Publisher grubBoxObjPuber;
+static ros::Publisher grabCmdPuber;
 static ros::Publisher feedbackPuber;
 
 void feedback2user(std::string str)
@@ -348,7 +346,6 @@ void executeNavigation(const wpr_msgs::instruction& msg)
     }
 }
 
-
 void executeGrab(const wpr_msgs::instruction& msg)
 {
     switch (state) {
@@ -357,12 +354,16 @@ void executeGrab(const wpr_msgs::instruction& msg)
     case NAVIGATING:
         break;
     case IDLE: {
-        std_msgs::Float32MultiArray box_plane_msg;
-        std_msgs::Float32MultiArray box_obj_msg;
-        box_plane_msg.data = msg.box_plane;
-        box_obj_msg.data = msg.box_obj;
-        grubBoxPlanePuber.publish(box_plane_msg);
-        grubBoxObjPuber.publish(box_obj_msg);
+        std_msgs::String msgPub;
+        if (msg.type == wpr_msgs::instruction::GRAB_START) {
+            msgPub.data = "grab";
+        } else if (msg.type == wpr_msgs::instruction::GRAB_STOP) {
+            msgPub.data = "stop";
+        } else if (msg.type == wpr_msgs::instruction::RELEASE_START) {
+            msgPub.data = "release";
+        }
+        grabCmdPuber.publish(msgPub);
+        stateChangeTo(GRABING);
     } break;
     case GRABING:
         break;
@@ -380,7 +381,7 @@ void executeBarrier(const wpr_msgs::instruction& msg)
         case IDLE:
             start_barrier();
             break;
-	case NAVIGATING:
+        case NAVIGATING:
         case GRABING:
             break;
         default:
@@ -415,7 +416,7 @@ void executeVoice(const wpr_msgs::instruction& msg)
         case IDLE:
             start_voice();
             break;
-	case NAVIGATING:
+        case NAVIGATING:
         case GRABING:
             break;
         default:
@@ -440,7 +441,6 @@ void executeVoice(const wpr_msgs::instruction& msg)
         ROS_INFO("unrecognized msg in executeMappingCtrl");
     }
 }
-
 
 void exceptionMapdel(const wpr_msgs::instruction& msg)
 {
@@ -505,11 +505,9 @@ void subCallback(const wpr_msgs::instruction& msg)
     case wpr_msgs::instruction::NAV_CANCEL:
         executeNavigation(msg);
         break;
-    // case wpr_msgs::instruction::OBJ_DETECT:
-    //     executeObjDetect(msg);
-    //     break;
     case wpr_msgs::instruction::GRAB_START:
     case wpr_msgs::instruction::RELEASE_START:
+    case wpr_msgs::instruction::GRAB_STOP:
         executeGrab(msg);
         break;
     case wpr_msgs::instruction::BARRIER_START:
@@ -520,6 +518,7 @@ void subCallback(const wpr_msgs::instruction& msg)
     case wpr_msgs::instruction::VOICE_END:
         executeVoice(msg);
         break;
+
     //exception
     case wpr_msgs::instruction::NAV_UNREACHABLE:
     case wpr_msgs::instruction::NAV_ARRIVED:
@@ -529,6 +528,9 @@ void subCallback(const wpr_msgs::instruction& msg)
     case wpr_msgs::instruction::MAP_LOAD_ERROR:
         exceptionMapload(msg);
         break;
+    case wpr_msgs::instruction::GRAB_FINISHED:
+        stateChangeTo(IDLE);
+
     //unrecognized
     default:
         ROS_INFO("unrecognized instruction or exception");
@@ -548,13 +550,16 @@ int main(int argc, char* argv[])
     navPuber = nh.advertise<geometry_msgs::PoseStamped>("navigation_ctrl", 1000);
     movePuber = nh.advertise<std_msgs::Int32>("inter_move", 1000);
     mapPuber = nh.advertise<std_msgs::String>("map_manager", 1000);
-    barrierPuber = nh.advertise<std_msgs::Int32>("barrier_switch", 1000);
-    barrierPuber = nh.advertise<std_msgs::Int32>("voice_switch", 1000);
 
-    //TODO: rename the topic
-    objDetectPuber = nh.advertise<sensor_msgs::PointCloud2>("/cloud_pub", 1000);
-    grubBoxPlanePuber = nh.advertise<std_msgs::Float32MultiArray>("/box_plane", 1000);
-    grubBoxObjPuber = nh.advertise<std_msgs::Float32MultiArray>("/box_objects", 1000);
+    // ros::Publisher pub = nh.advertise<wpr_msgs::instruction>("instruction", 1000);
+    // wpr_msgs::instruction msg;
+    // msg.type = wpr_msgs::instruction::GRAB_FINISHED;
+    // pub.publish(msg);
+
+    barrierPuber = nh.advertise<std_msgs::Int32>("barrier_switch", 1000);
+    voicePuber = nh.advertise<std_msgs::Int32>("voice_switch", 1000);
+
+    grabCmdPuber = nh.advertise<std_msgs::String>("/do_grab", 1000);
 
     // init state
     state = IDLE;
