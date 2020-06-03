@@ -47,10 +47,18 @@ static ros::Publisher navPuber;
 static ros::Publisher movePuber;
 static ros::Publisher mapPuber;
 static ros::Publisher barrierPuber;
-static ros::Subscriber cloudSub;
 static ros::Publisher objDetectPuber;
 static ros::Publisher grubBoxPlanePuber;
 static ros::Publisher grubBoxObjPuber;
+static ros::Publisher feedbackPuber;
+
+void feedback2user(std::string str)
+{
+    ROS_INFO("%s", str.c_str());
+    std_msgs::String ret;
+    ret.data = str;
+    feedbackPuber.publish(ret);
+}
 
 void stateChangeTo(enum STATE to)
 {
@@ -325,30 +333,6 @@ void executeNavigation(const wpr_msgs::instruction& msg)
     }
 }
 
-bool exeObjDetectOnce;
-void cloudSubCallback(const sensor_msgs::PointCloud2& cloud)
-{
-    if (exeObjDetectOnce) {
-        objDetectPuber.publish(cloud);
-        exeObjDetectOnce = false;
-    }
-}
-
-void executeObjDetect(const wpr_msgs::instruction& msg)
-{
-    switch (state) {
-    case NOT_LOAD_MAP:
-    case MAPPING:
-    case IDLE:
-        exeObjDetectOnce = true;
-        break;
-    case NAVIGATING:
-    case GRABING:
-        break;
-    default:
-        ROS_INFO("unrecognized state");
-    }
-}
 
 void executeGrab(const wpr_msgs::instruction& msg)
 {
@@ -430,11 +414,12 @@ void exceptionNavigation(const wpr_msgs::instruction& msg)
         ROS_INFO("[exception] the exception shouldn't be published during this state");
     } else {
         if (msg.type == wpr_msgs::instruction::NAV_UNREACHABLE) {
-            ROS_INFO("[exception] nvaigation unreachable");
+            feedback2user("navigation goal unreachable");
+            ROS_WARN("nvaigation unreachable");
         } else if (msg.type == wpr_msgs::instruction::NAV_ARRIVED) {
-            ROS_INFO("navigation goal arrived");
+            feedback2user("navigation goal arrived");
         } else if (msg.type == wpr_msgs::instruction::NAV_STUCK) {
-            ROS_INFO("robot maybe got stuck");
+            feedback2user("robot maybe got stuck");
         }
         stateChangeTo(IDLE);
     }
@@ -469,10 +454,11 @@ void subCallback(const wpr_msgs::instruction& msg)
     case wpr_msgs::instruction::NAV_CANCEL:
         executeNavigation(msg);
         break;
-    case wpr_msgs::instruction::OBJ_DETECT:
-        executeObjDetect(msg);
-        break;
+    // case wpr_msgs::instruction::OBJ_DETECT:
+    //     executeObjDetect(msg);
+    //     break;
     case wpr_msgs::instruction::GRAB_START:
+    case wpr_msgs::instruction::RELEASE_START:
         executeGrab(msg);
         break;
     case wpr_msgs::instruction::BARRIER_START:
@@ -501,6 +487,7 @@ int main(int argc, char* argv[])
 
     ros::NodeHandle nh;
     ros::Subscriber sub = nh.subscribe("instruction", 1000, subCallback);
+    ros::Publisher feedbackPuber = nh.advertise<std_msgs::String>("feedback2ui", 1000);
 
     // init every Publisher
     navPuber = nh.advertise<geometry_msgs::PoseStamped>("navigation_ctrl", 1000);
@@ -509,15 +496,14 @@ int main(int argc, char* argv[])
     barrierPuber = nh.advertise<std_msgs::Int32>("barrier_switch", 1000);
 
     //TODO: rename the topic
-    ros::Subscriber cloudSub = nh.subscribe("/kinect2/sd/points", 1, cloudSubCallback);
     objDetectPuber = nh.advertise<sensor_msgs::PointCloud2>("/cloud_pub", 1000);
     grubBoxPlanePuber = nh.advertise<std_msgs::Float32MultiArray>("/box_plane", 1000);
     grubBoxObjPuber = nh.advertise<std_msgs::Float32MultiArray>("/box_objects", 1000);
 
     // init state
     state = IDLE;
-    exeObjDetectOnce = false;
 
+    ROS_INFO("listening to /instruction for command");
     ros::spin();
     return 0;
 }
