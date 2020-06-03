@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(vel_pkg)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -256,6 +256,15 @@ add_dependencies(cmd_move ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_
 target_link_libraries(cmd_move
   ${catkin_LIBRARIES}
 )
+
+add_executable(key_move
+  src/key_move.cpp
+)
+add_dependencies(key_move ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(key_move
+  ${catkin_LIBRARIES}
+)
+
 
 add_executable(auto_move
   src/auto_move.cpp
