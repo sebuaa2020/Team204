@@ -27,7 +27,19 @@ int main(int argc, char** argv)
     std_msgs::String msg1;
     ros::Duration(3.0).sleep();
     printf("send %d\n", 0);
+    msg1.data = "Hello";
+    test_pub.publish(msg1);
+    ros::spinOnce();
+
+    ros::Duration(3.0).sleep();
+    printf("send %d\n", 0);
     msg1.data = "forward";
+    test_pub.publish(msg1);
+    ros::spinOnce();
+
+    ros::Duration(3.0).sleep();
+    printf("send %d\n", 0);
+    msg1.data = "stop please";
     test_pub.publish(msg1);
     ros::spinOnce();
 return 0;

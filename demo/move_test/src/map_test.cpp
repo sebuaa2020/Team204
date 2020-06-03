@@ -63,13 +63,6 @@ int main(int argc, char** argv)
     test_pub.publish(msg1);
     ros::spinOnce();
     ros::Duration(3.0).sleep();
-    
-    i++;
-    printf("send %d\n", i);
-    msg1.data = "load test";
-    test_pub.publish(msg1);
-    ros::spinOnce();
-    ros::Duration(3.0).sleep();
 */
 return 0;
 }
