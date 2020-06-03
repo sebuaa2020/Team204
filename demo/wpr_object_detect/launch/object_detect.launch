@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="wpr_object_detect" type="wpr_object_detect_node" name="wpr_object_detect" output="screen">
+    <remap from="cloud_pcd" to="kinect2/sd/points"/>
+  </node>
+</launch>

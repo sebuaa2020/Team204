@@ -41,16 +41,17 @@ int8 NAV_CANCEL = 18
 # 目标抓取相关指令
 int8 GRAB_START = 19
 int8 RELEASE_START = 20
+int8 GRAB_STOP = 21
 
 ############################
 # 障碍物检测相关指令
-int8 BARRIER_START = 21
-int8 BARRIER_END = 22
+int8 BARRIER_START = 22
+int8 BARRIER_END = 23
 
 ############################
 # 语音控制相关指令
-int8 VOICE_START = 23
-int8 VOICE_END = 24
+int8 VOICE_START = 24
+int8 VOICE_END = 25
 
 ################################################
 # 异常处理
@@ -61,3 +62,5 @@ int8 NAV_STUCK = 103
 
 int8 MAP_DEL_ERROR = 104
 int8 MAP_LOAD_ERROR = 105
+
+int8 GRAB_FINISHED = 106

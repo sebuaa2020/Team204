@@ -15,8 +15,7 @@ typedef pcl::PointXYZ PointT;
 /** \brief Object detection module
  */
 class ObjectDetect {
-//private:
-public:
+private:
     float zPassThroughLimitMax;
     float zPassThroughLimitMin;
     pcl::PointCloud<PointT>::Ptr cloud_filtered;
@@ -53,6 +52,11 @@ public:
      * \retval false otherwise
      */
     bool detectObject(std::vector<pcl::PointCloud<PointT>> &clusters_cloud);
+
+    /** \brief get filtered point cloud
+     * \return point cloud
+     */
+    pcl::PointCloud<PointT>::Ptr getFilteredCloud();
 };
 
 
