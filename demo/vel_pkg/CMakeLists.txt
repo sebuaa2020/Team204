@@ -223,3 +223,60 @@ add_dependencies(wpb_home_behavior_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${ca
 target_link_libraries(wpb_home_behavior_node
   ${catkin_LIBRARIES}
 )
+
+
+add_executable(voice_move
+  src/voice_move.cpp
+)
+add_dependencies(voice_move ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(voice_move
+  ${catkin_LIBRARIES}
+)
+
+add_executable(move_vel
+  src/move_vel.cpp
+)
+add_dependencies(move_vel ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(move_vel
+  ${catkin_LIBRARIES}
+)
+
+add_executable(move_cmd
+  src/move_cmd.cpp
+)
+add_dependencies(move_cmd ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(move_cmd
+  ${catkin_LIBRARIES}
+)
+
+add_executable(cmd_move
+  src/key_move.cpp
+)
+add_dependencies(cmd_move ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(cmd_move
+  ${catkin_LIBRARIES}
+)
+
+add_executable(auto_move
+  src/auto_move.cpp
+)
+add_dependencies(auto_move ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(auto_move
+  ${catkin_LIBRARIES}
+)
+
+add_executable(interface_move
+  src/interface_move.cpp
+)
+add_dependencies(interface_move ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(interface_move
+  ${catkin_LIBRARIES}
+)
+
+add_executable(barrier_detection
+  src/barrier_detection.cpp
+)
+add_dependencies(barrier_detection ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+target_link_libraries(barrier_detection
+  ${catkin_LIBRARIES}
+)
