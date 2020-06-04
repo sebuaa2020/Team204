@@ -354,11 +354,13 @@ void executeNavigation(const wpr_msgs::instruction& msg)
             feedback2user("navigation failed: grab mission is taking control");
             break;
         case IDLE:
+	    end_barrier();
             navStart(msg);
             stateChangeTo(NAVIGATING);
             feedback2user("start navigation");
             break;
         case NAVIGATING:
+	    end_barrier();
             navStart(msg);
             stateChangeTo(NAVIGATING);
             feedback2user("start new navigation");
