@@ -36,8 +36,17 @@ def create_map():
     def load_map():
         load_win = Tk()
         load_win.title("加载地图")
-        load_win.geometry("800x800")
-        #pyt.load_map("test")
+        load_win.geometry("400x400")
+        
+        load_file = StringVar()
+        load_win_en = Entry(load_win, textvariable=load_file)
+        load_win_en.place(relx=0.5, rely=0.5, anchor='center')
+
+        def load():
+            pyt.load_map(load_file.get())
+
+        load_bt = Button(load_win, text="OK", command=load)
+
 
     def unload_map():
         pyt.unload_map()
