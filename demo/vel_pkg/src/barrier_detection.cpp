@@ -52,11 +52,11 @@ std_msgs::Int32  bar_msg;
     else
     {
         bar_msg.data = 0;
-        if (swit)
-        {
+        // if (swit)
+        // {
             move_pub.publish(bar_msg);
             ros::spinOnce();
-        }
+        // }
     }
 }
 

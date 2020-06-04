@@ -135,7 +135,7 @@ double turn = 1;
 
 int main(int argc, char** argv)
 {
-  swit = false;
+  swit = true;
   ros::init(argc, argv, "cmd_move");
   ros::NodeHandle n;
   ros::Publisher vel_pub = n.advertise<std_msgs::Float32MultiArray>("/move_vel", 10);
@@ -151,6 +151,7 @@ int main(int argc, char** argv)
   double control_speed = 0;
   double control_turn = 0;
 
+  cout << msg;
   while(ros::ok())
   {
     int key = getKey();

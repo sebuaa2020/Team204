@@ -71,12 +71,16 @@ void list_map()
         cout << "Error opening file";
         exit(1);
     }
-    cout << "going to read file" << endl;
+    // cout << "going to read file" << endl;
+    cout <<"***************" << endl;
+    cout << "all map :" << endl;
     while (!in.eof()) {
         in.getline(buffer, 100);
         cout << buffer << endl;
     }
     in.close();
+    cout <<"***************" << endl;
+    
 }
 
 void load_map(char* name)
@@ -106,7 +110,7 @@ void load_map(char* name)
     if (res != 0) {
         printf("wdnmd\n");
     }
-    ROS_INFO("load map success\n");    
+    ROS_INFO("load map success\n");
 }
 
 void unload_map()
@@ -117,6 +121,7 @@ void unload_map()
 
 void del_map(char* name)
 {
+    cout << "trying to delete map: "<< string(name) << endl;
     char buffer[100];
     vector<string> files;
     ifstream in("../maps/maps.txt");
@@ -183,15 +188,15 @@ void KeywordCB(const std_msgs::String::ConstPtr& msg)
     }
     nFindIndex = msg->data.find("delete");
     if (nFindIndex >= 0) {
-        string str = msg->data.substr(5, msg->data.size());
+        string str = msg->data.substr(7, msg->data.size());
         strcpy(para, str.data());
         del_map(para);
     }
 
     nFindIndex = msg->data.find("unload");
     if (nFindIndex >= 0) {
-        string str = msg->data.substr(5, msg->data.size());
-        strcpy(para, str.data());
+        // string str = msg->data.substr(5, msg->data.size());
+        // strcpy(para, str.data());
         unload_map();
     }
 
