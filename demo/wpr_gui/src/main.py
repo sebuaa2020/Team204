@@ -134,13 +134,13 @@ def forward():
     pyt.go_forward()
 
 def left():
-    pyt.go_backward()
+    pyt.go_left()
 
 def right():
     pyt.turn_right()
 
 def backward():
-    pyt.turn_left()
+    pyt.turn_backward()
 
 def speed_up():
     pyt.linear_speedup()
@@ -171,8 +171,8 @@ bt_obj.place(relx=0.7, rely=0.4, anchor='center', relwidth=0.15, relheight=0.08)
 bt_init = Button(main_win, text="初始化", font=ft_function, command=init_system)
 bt_init.place(relx=0.5, rely=0.3, anchor='center', relwidth=0.15, relheight=0.08)
 
-bt_init = Button(main_win, text="障碍检测", font=ft_function, command=barrier)
-bt_init.place(relx=0.3, rely=0.5, anchor='center', relwidth=0.15, relheight=0.08)
+#bt_init = Button(main_win, text="障碍检测", font=ft_function, command=barrier)
+#bt_init.place(relx=0.3, rely=0.5, anchor='center', relwidth=0.15, relheight=0.08)
 
 bt_voice = Button(main_win, text="语音控制",font=ft_function, command=voice)
 bt_voice.place(relx=0.5, rely=0.5, anchor='center', relwidth=0.15, relheight=0.08)
