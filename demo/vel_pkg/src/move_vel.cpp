@@ -39,23 +39,36 @@ float speed, turn;
 
 speed = msg->data.at(0);
 turn = msg->data.at(1);
-if (speed > 0.5 || speed < -0.5)
+if (speed > 0.5)
 {
-  speed = 3.0;
+  speed = 0.5;
   ROS_INFO("linear speed warning");
 }
 
-if (turn > 0.3 || turn < -0.3)
+if (speed < -0.5)
 {
-  speed = 3.0;
+  speed = -0.5;
+  ROS_INFO("linear speed warning");
+}
+
+if (turn > 0.5)
+{
+  turn = 0.5;
   ROS_INFO("angular speed warning");
 }
+
+if (turn < -0.5)
+{
+  turn = -0.5;
+  ROS_INFO("angular speed warning");
+}
+
 if(lock && speed > 0)
 {
   speed = 0;
 }
   vel_cmd = Move_and_turn(speed, turn*0.3);
-  printf("rec %f, %f\n", speed, turn);
+  //printf("rec %f, %f\n", speed, turn);
   vel_pub.publish(vel_cmd);
    ros::spinOnce();
 }
