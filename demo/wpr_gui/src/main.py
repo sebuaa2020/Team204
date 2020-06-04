@@ -25,7 +25,19 @@ def create_map():
         pyt.mapping_end() 
 
     def save_map():
-        pyt.save_map("test")
+        save_win = Tk()
+        save_win.title("保存地图")
+        save_win.geometry("400x400")
+        
+        save_file = StringVar()
+        save_win_en = Entry(save_win, textvariable=save_file)
+        save_win_en.place(relx=0.5, rely=0.5, anchor='center')
+
+        def save():
+            pyt.save_map(save_file.get())
+
+        save_bt = Button(save_win, text="OK", command=save)
+        save_bt.place(relx=0.5, rely=0.6, anchor='center')
 
     def list_map():
         pyt.list_map()
