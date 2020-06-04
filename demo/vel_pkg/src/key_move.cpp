@@ -151,7 +151,7 @@ int main(int argc, char** argv)
   double control_speed = 0;
   double control_turn = 0;
 
-  while(1)
+  while(ros::ok())
   {
     int key = getKey();
     if(key < 0)
