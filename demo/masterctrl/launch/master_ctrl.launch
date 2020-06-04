@@ -11,7 +11,7 @@
     <!-- interface_move -->
     <node pkg="vel_pkg" type="interface_move" name="interface_move" output="screen"/>
     <!-- map manager -->
-    <node pkg="map_manager" type="map_manager" name="map_manager" output="screen"/>
+    <!-- <node pkg="map_manager" type="map_manager" name="map_manager" output="screen"/> -->
 
     <!-- master -->
     <!-- <node pkg="masterctrl" type="wpr_master_ctrl" name="wpr_master_ctrl" output="screen"/> -->
