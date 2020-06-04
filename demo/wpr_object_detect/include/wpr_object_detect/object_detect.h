@@ -9,6 +9,7 @@
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <map>
 
 typedef pcl::PointXYZ PointT;
 
@@ -16,6 +17,8 @@ typedef pcl::PointXYZ PointT;
  */
 class ObjectDetect {
 private:
+    std::pair<float, float> xPassThroughLimit;
+    std::pair<float, float> yPassThroughLimit;
     float zPassThroughLimitMax;
     float zPassThroughLimitMin;
     pcl::PointCloud<PointT>::Ptr cloud_filtered;
@@ -26,6 +29,18 @@ public:
     /** \brief constructor
      */
     ObjectDetect();
+
+    /** \brief set PassThrough filter limits
+     * \param limit_min The minimum allowed x value
+     * \param limit_max The maximum allowed x value
+     */
+    void setxLimits(const float &limit_min, const float &limit_max);
+
+    /** \brief set PassThrough filter limits
+     * \param limit_min The minimum allowed y value
+     * \param limit_max The maximum allowed y value
+     */
+    void setyLimits(const float &limit_min, const float &limit_max);
 
     /** \brief set PassThrough filter limits
      * \param limit_min The minimum allowed z value
