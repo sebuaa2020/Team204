@@ -104,7 +104,7 @@ def nav():
     nav_win.title("导航")
     nav_win.geometry("1000x1000")
 
-    def nac_start():
+    def nav_start():
         pyt.nav_start(0.0 , 0.0, 0.0)
         
     def nav_cancel():
