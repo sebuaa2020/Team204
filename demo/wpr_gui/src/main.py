@@ -1,10 +1,10 @@
 #coding=utf-8
-from tkinter import *
-#from Tkinter import *
-#import tkFont
-import tkinter.font as tkFont
+#from tkinter import *
+from Tkinter import *
+import tkFont
+#import tkinter.font as tkFont
 import os
-#import pytalker as pyt
+import pytalker as pyt
 
 bash_path = " ~/Documents/demo/devel/setup.bash"
 
