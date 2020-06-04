@@ -46,7 +46,7 @@ def create_map():
             pyt.load_map(load_file.get())
 
         load_bt = Button(load_win, text="OK", command=load)
-
+        load_bt.place(relx=0.5, rely=0.6, anchor='center')
 
     def unload_map():
         pyt.unload_map()
