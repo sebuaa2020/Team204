@@ -1,6 +1,8 @@
 #coding=utf-8
+#from tkinter import *
 from Tkinter import *
 import tkFont
+#import tkinter.font as tkFont
 import os
 import pytalker as pyt
 
@@ -23,16 +25,55 @@ def create_map():
         pyt.mapping_end() 
 
     def save_map():
-        pyt.save_map("test")
+        save_win = Tk()
+        save_win.title("保存地图")
+        save_win.geometry("400x400")
+        
+        save_file = StringVar()
+        save_win_en = Entry(save_win, textvariable=save_file)
+        save_win_en.place(relx=0.5, rely=0.5, anchor='center')
+
+        def save():
+            pyt.save_map(save_file.get())
+
+        save_bt = Button(save_win, text="OK", command=save)
+        save_bt.place(relx=0.5, rely=0.6, anchor='center')
 
     def list_map():
         pyt.list_map()
 
     def delete_map():
-        pyt.delete_map("test")
+        delete_win = Tk()
+        delete_win.title("删除地图")
+        delete_win.geometry("400x400")
+        
+        delete_file = StringVar()
+        delete_win_en = Entry(delete_win, textvariable=delete_file)
+        delete_win_en.place(relx=0.5, rely=0.5, anchor='center')
+
+        def delete():
+            pyt.delete_map(delete_file.get())
+
+        delete_bt = Button(delete_win, text="OK", command=delete)
+        delete_bt.place(relx=0.5, rely=0.6, anchor='center')
 
     def load_map():
-        pyt.load_map("test")
+        load_win = Tk()
+        load_win.title("加载地图")
+        load_win.geometry("400x400")
+        
+        load_file = StringVar()
+        load_win_en = Entry(load_win, textvariable=load_file)
+        load_win_en.place(relx=0.5, rely=0.5, anchor='center')
+
+        def load():
+            pyt.load_map(load_file.get())
+
+        load_bt = Button(load_win, text="OK", command=load)
+        load_bt.place(relx=0.5, rely=0.6, anchor='center')
+
+    def unload_map():
+        pyt.unload_map()
 
     map_ft = tkFont.Font(size=20)
     map_stop_bt = Button(map_win, text="停止", font=map_ft, command=mapping_end)
@@ -53,7 +94,11 @@ def create_map():
     load_map_bt = Button(map_win, text="加载", font=map_ft, command=load_map)
     load_map_bt.place(relx=0.5, rely=0.8, anchor='center', relwidth=0.15, relheight=0.08)
 
+    unload_map_bt = Button(map_win, text="卸载", font=map_ft, command=unload_map)
+    unload_map_bt.place(relx=0.5, rely=0.9, anchor='center', relwidth=0.15, relheight=0.08)
 
+    
+    
 def nav():
     nav_win = Tk()
     nav_win.title("导航")
@@ -134,13 +179,13 @@ def forward():
     pyt.go_forward()
 
 def left():
-    pyt.go_backward()
+    pyt.go_left()
 
 def right():
     pyt.turn_right()
 
 def backward():
-    pyt.turn_left()
+    pyt.turn_backward()
 
 def speed_up():
     pyt.linear_speedup()
@@ -171,8 +216,8 @@ bt_obj.place(relx=0.7, rely=0.4, anchor='center', relwidth=0.15, relheight=0.08)
 bt_init = Button(main_win, text="初始化", font=ft_function, command=init_system)
 bt_init.place(relx=0.5, rely=0.3, anchor='center', relwidth=0.15, relheight=0.08)
 
-bt_init = Button(main_win, text="障碍检测", font=ft_function, command=barrier)
-bt_init.place(relx=0.3, rely=0.5, anchor='center', relwidth=0.15, relheight=0.08)
+#bt_init = Button(main_win, text="障碍检测", font=ft_function, command=barrier)
+#bt_init.place(relx=0.3, rely=0.5, anchor='center', relwidth=0.15, relheight=0.08)
 
 bt_voice = Button(main_win, text="语音控制",font=ft_function, command=voice)
 bt_voice.place(relx=0.5, rely=0.5, anchor='center', relwidth=0.15, relheight=0.08)
