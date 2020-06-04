@@ -1,8 +1,10 @@
 #coding=utf-8
-from Tkinter import *
-import tkFont
+from tkinter import *
+#from Tkinter import *
+#import tkFont
+import tkinter.font as tkFont
 import os
-import pytalker as pyt
+#import pytalker as pyt
 
 bash_path = " ~/Documents/demo/devel/setup.bash"
 
@@ -32,7 +34,13 @@ def create_map():
         pyt.delete_map("test")
 
     def load_map():
-        pyt.load_map("test")
+        load_win = Tk()
+        load_win.title("加载地图")
+        load_win.geometry("800x800")
+        #pyt.load_map("test")
+
+    def unload_map():
+        pyt.unload_map()
 
     map_ft = tkFont.Font(size=20)
     map_stop_bt = Button(map_win, text="停止", font=map_ft, command=mapping_end)
@@ -53,7 +61,11 @@ def create_map():
     load_map_bt = Button(map_win, text="加载", font=map_ft, command=load_map)
     load_map_bt.place(relx=0.5, rely=0.8, anchor='center', relwidth=0.15, relheight=0.08)
 
+    unload_map_bt = Button(map_win, text="卸载", font=map_ft, command=unload_map)
+    unload_map_bt.place(relx=0.5, rely=0.9, anchor='center', relwidth=0.15, relheight=0.08)
 
+    
+    
 def nav():
     nav_win = Tk()
     nav_win.title("导航")
