@@ -24,20 +24,20 @@ def create_map():
     def mapping_end():
         pyt.mapping_end() 
 
-    def delete_map():
-        delete_win = Tk()
-        delete_win.title("保存地图")
-        delete_win.geometry("400x400")
+    def save_map():
+        save_win = Tk()
+        save_win.title("保存地图")
+        save_win.geometry("400x400")
         
-        delete_file = StringVar()
-        delete_win_en = Entry(delete_win, textvariable=delete_file)
-        delete_win_en.place(relx=0.5, rely=0.5, anchor='center')
+        save_file = StringVar()
+        save_win_en = Entry(save_win, textvariable=save_file)
+        save_win_en.place(relx=0.5, rely=0.5, anchor='center')
 
-        def delete():
-            pyt.delete_map(delete_file.get())
+        def save():
+            pyt.save_map(save_file.get())
 
-        delete_bt = Button(delete_win, text="OK", command=delete)
-        delete_bt.place(relx=0.5, rely=0.6, anchor='center')
+        save_bt = Button(save_win, text="OK", command=save)
+        save_bt.place(relx=0.5, rely=0.6, anchor='center')
 
     def list_map():
         pyt.list_map()
@@ -82,8 +82,8 @@ def create_map():
     map_start_bt = Button(map_win, text="开始", font=map_ft, command=mapping_start)
     map_start_bt.place(relx=0.5, rely=0.7, anchor='center', relwidth=0.15, relheight=0.08)
 
-    map_delete_bt = Button(map_win, text="保存", font=map_ft, command=delete_map)
-    map_delete_bt.place(relx=0.7, rely=0.7, anchor='center', relwidth=0.15, relheight=0.08)
+    map_save_bt = Button(map_win, text="保存", font=map_ft, command=save_map)
+    map_save_bt.place(relx=0.7, rely=0.7, anchor='center', relwidth=0.15, relheight=0.08)
     
     list_map_bt = Button(map_win, text="展示", font=map_ft, command=list_map)
     list_map_bt.place(relx=0.3, rely=0.8, anchor='center', relwidth=0.15, relheight=0.08)
