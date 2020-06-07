@@ -1,0 +1,7 @@
+filter:
+  x_limit_min: 0.0
+  x_limit_max: 2.0
+  y_limit_min: -1.0
+  y_limit_max: 1.0
+  z_limit_min: 0.1
+  z_limit_max: 1.5

@@ -23,6 +23,7 @@ static stBoxMarker boxMarker;
 static ros::Publisher pub_planar;
 static ros::Publisher pub_objects;
 static ros::Publisher marker_pub;
+static ros::Publisher pub_cloud;
 static ObjectDetect objectDetect;
 
 void calcBoxMarker(pcl::PointCloud<PointT>::Ptr cloud, std_msgs::Float32MultiArray &msg) {
@@ -49,6 +50,12 @@ void calcBoxMarker(pcl::PointCloud<PointT>::Ptr cloud, std_msgs::Float32MultiArr
     msg.data.push_back(boxMarker.zMax);
 }
 
+void pubCloud(const ros::Publisher &pub, pcl::PointCloud<PointT>::Ptr cloud) {
+    cloud->header.frame_id = "base_footprint";
+    pcl_conversions::toPCL(ros::Time::now(), cloud->header.stamp);
+    pub.publish(cloud);
+}
+
 void ProcCloudCB(const sensor_msgs::PointCloud2 &input) {
     ROS_INFO("ProcCloudCB: %d, %d", input.height, input.width);
     bool r;
@@ -66,6 +73,7 @@ void ProcCloudCB(const sensor_msgs::PointCloud2 &input) {
     cloud_source_ptr = cloud_src.makeShared();
 
     objectDetect.setInputCloud(cloud_source_ptr);
+    pubCloud(pub_cloud, objectDetect.getFilteredCloud());
 
     pcl::PointCloud<PointT>::Ptr cloud_plane(new pcl::PointCloud<PointT>());
     r = objectDetect.detectPlane(cloud_plane);
@@ -100,14 +108,35 @@ void ProcCloudCB(const sensor_msgs::PointCloud2 &input) {
     pub_objects.publish(boxMsg);
 }
 
+static float x_limit_min;
+static float x_limit_max;
+static float y_limit_min;
+static float y_limit_max;
+static float z_limit_min;
+static float z_limit_max;
+
 int main(int argc, char **argv) {
     ros::init(argc, argv, "wpr_object_detect_node");
     ros::NodeHandle nh;
+    ros::NodeHandle param("~");
     ros::Subscriber pc_sub = nh.subscribe("/cloud_pcd", 1, ProcCloudCB);
     marker_pub = nh.advertise<visualization_msgs::Marker>("obj_marker", 10);
 
     pub_planar = nh.advertise<std_msgs::Float32MultiArray>("box_plane", 1);
     pub_objects = nh.advertise<std_msgs::Float32MultiArray>("box_objects", 1);
+
+    pub_cloud = nh.advertise<sensor_msgs::PointCloud2>("cloud_plane", 1);
+
+    param.param("filter/x_limit_min", x_limit_min, 0.0f);
+    param.param("filter/x_limit_max", x_limit_max, 1.5f);
+    param.param("filter/y_limit_min", y_limit_min, -1.0f);
+    param.param("filter/y_limit_max", y_limit_max, 1.0f);
+    param.param("filter/z_limit_min", z_limit_min, 0.1f);
+    param.param("filter/z_limit_max", z_limit_max, 1.5f);
+    objectDetect.setxLimits(x_limit_min, x_limit_max);
+    objectDetect.setyLimits(y_limit_min, y_limit_max);
+    objectDetect.setzLimits(z_limit_min, z_limit_max);
+    ROS_INFO("x_limit_max: %f", x_limit_max);
 
     ROS_INFO("wpr_object_detect_node");
     tf_listener = std::make_shared<tf::TransformListener>();

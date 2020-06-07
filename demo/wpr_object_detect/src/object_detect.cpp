@@ -17,8 +17,19 @@ ObjectDetect::ObjectDetect() : zPassThroughLimitMin(0.1), zPassThroughLimitMax(1
     cloud_filtered = pcl::PointCloud<PointT>::Ptr(new pcl::PointCloud<PointT>);
     cloud_hull = pcl::PointCloud<PointT>::Ptr(new pcl::PointCloud<PointT>);
     isDetectedPlane = false;
+    xPassThroughLimit = std::pair<float, float>(0.0f, 1.5f);
+    yPassThroughLimit = std::pair<float, float>(-1.0f, 1.0f);
 }
 
+void ObjectDetect::setxLimits(const float &limit_min, const float &limit_max) {
+    xPassThroughLimit.first = limit_min;
+    xPassThroughLimit.second = limit_max;
+}
+
+void ObjectDetect::setyLimits(const float &limit_min, const float &limit_max) {
+    yPassThroughLimit.first = limit_min;
+    yPassThroughLimit.second = limit_max;
+}
 
 void ObjectDetect::setzLimits(const float &limit_min, const float &limit_max) {
     zPassThroughLimitMin = limit_min;
@@ -30,12 +41,12 @@ void ObjectDetect::setInputCloud(pcl::PointCloud<PointT>::Ptr cloud) {
     pcl::PassThrough<PointT> pass;
     pass.setInputCloud(cloud);
     pass.setFilterFieldName("x");
-    pass.setFilterLimits(0.0, 1.5);
+    pass.setFilterLimits(xPassThroughLimit.first, xPassThroughLimit.second);
     pass.filter(*cloud_filtered);
 
     pass.setInputCloud(cloud_filtered);
     pass.setFilterFieldName("y");
-    pass.setFilterLimits(-1.0, 1.0);
+    pass.setFilterLimits(yPassThroughLimit.first, yPassThroughLimit.second);
     pass.filter(*cloud_filtered);
 
     pass.setInputCloud(cloud_filtered);
